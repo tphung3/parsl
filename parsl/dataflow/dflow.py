@@ -355,8 +355,8 @@ class DataFlowKernel(object):
                 res = future.result()
                 if isinstance(res, RemoteExceptionWrapper):
                     res.reraise()
-                self.tasks[task_id]['app_fu'].set_result(future.result())
 
+                self.tasks[task_id]['app_fu'].set_result(future.result())
             except Exception as e:
                 if self.tasks[task_id]['retries_left'] > 0:
                     # ignore this exception, because assume some later
@@ -856,7 +856,7 @@ class DataFlowKernel(object):
 
         self.launch_if_ready(task_id)
 
-        return task_def['app_fu']
+        return app_fu
 
     # it might also be interesting to assert that all DFK
     # tasks are in a "final" state (3,4,5) when the DFK
