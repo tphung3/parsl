@@ -234,7 +234,7 @@ class Memoizer(object):
         A warning is issued when a hash collision occurs during the update.
         This is not likely.
         """
-        if not self.memoize or not task['memoize']:
+        if not self.memoize or not task['memoize'] or 'hashsum' not in task:
             return
 
         # this test is so that at runtime we know the value from task['hashsum']
