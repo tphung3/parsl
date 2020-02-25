@@ -259,3 +259,7 @@ class AdHocProvider(ExecutionProvider, MultiChanneled, RepresentationMixin):
     @property
     def label(self):
         return self._label
+
+    @property
+    def status_polling_interval(self):
+        return 10

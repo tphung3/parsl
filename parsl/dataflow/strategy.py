@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 import time
 import math
+from typing import List
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -27,7 +28,9 @@ from typing import cast
 # of a thing that should be generic
 
 
+from parsl.dataflow.task_status_poller import ExecutorStatus
 from parsl.executors import HighThroughputExecutor, ExtremeScaleExecutor
+
 from parsl.providers.provider_base import JobState
 
 logger = logging.getLogger(__name__)
@@ -140,9 +143,10 @@ class Strategy(object):
         for e in self.dfk.config.executors:
             self.executors[e.label] = {'idle_since': None, 'config': e.label}
 
-        self.strategies = {None: self._strategy_noop, 'simple': self._strategy_simple}
+        self.strategies = {None: self._strategy_noop, 'simple': self._strategy_simple} # type: Dict[Optional[str], Callable]
 
-        self.strategize = self.strategies[self.config.strategy]
+        # mypy note: with mypy 0.761, the type of self.strategize is correctly revealed inside this module, but isn't carried over when Strategy is used in other modules unless this specific type annotation is used.
+        self.strategize = self.strategies[self.config.strategy]   # type: Callable
         self.logger_flag = False
         self.prior_loghandlers = set(logging.getLogger().handlers)
 
@@ -152,7 +156,7 @@ class Strategy(object):
         for executor in executors:
             self.executors[executor.label] = {'idle_since': None, 'config': executor.label}
 
-    def _strategy_noop(self, tasks, kind: Optional[str] =None) -> None:
+    def _strategy_noop(self, status: List[ExecutorStatus], tasks, kind: Optional[str] =None) -> None:
         """Do nothing.
 
         Args:
@@ -176,7 +180,7 @@ class Strategy(object):
 
         self.logger_flag = True
 
-    def _strategy_simple(self, tasks, kind: Optional[str] =None) -> None:
+    def _strategy_simple(self, status_list: List[ExecutorStatus], tasks, kind: Optional[str] =None) -> None:
         """Peek at the DFK and the executors specified.
 
         We assume here that tasks are not held in a runnable
@@ -191,14 +195,17 @@ class Strategy(object):
             - kind (Not used)
         """
 
-        for label, executor in self.dfk.executors.items():
+        for exec_status in status_list:
+            executor = exec_status.executor
+            label = executor.label
             if not executor.scaling_enabled:
                 continue
 
             # Tasks that are either pending completion
             active_tasks = executor.outstanding
 
-            status = executor.status()
+            status = exec_status.status
+            # Dict[object, JobStatus]: job_id -> status
             self.unset_logging()
 
             # FIXME we need to handle case where provider does not define these

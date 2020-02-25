@@ -1,10 +1,10 @@
 from __future__ import annotations
+import logging
 import sys
 import threading
-import logging
 import time
 
-from parsl.dataflow.strategy import Strategy
+from parsl.dataflow.task_status_poller import TaskStatusPoller
 
 from typing import List, Optional
 from typing import TYPE_CHECKING
@@ -92,8 +92,8 @@ class FlowControl(object):
         self.threshold = threshold
         self.interval = interval
         self.cb_args = args
-        self.strategy = Strategy(dfk)
-        self.callback = self.strategy.strategize
+        self.task_status_poller = TaskStatusPoller(dfk)
+        self.callback = self.task_status_poller.poll
         self._handle = None
         self._event_count = 0
         self._event_buffer = [] # type: List[str]
@@ -147,6 +147,9 @@ class FlowControl(object):
         except Exception:
             logger.error("Flow control callback threw an exception - logging and proceeding anyway", exc_info=True)
         self._event_buffer = []
+
+    def add_executors(self, executors):
+        self.task_status_poller.add_executors(executors)
 
     def close(self):
         """Merge the threads and terminate."""

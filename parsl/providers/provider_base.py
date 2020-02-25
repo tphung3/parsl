@@ -186,6 +186,15 @@ class ExecutionProvider(metaclass=ABCMeta):
     def cores_per_node(self, value: int) -> None:
         self._cores_per_node = value
 
+    @property
+    @abstractmethod
+    def status_polling_interval(self) -> int:
+        """Returns the interval, in seconds, at which the status method should be called.
+
+        :return: the number of seconds to wait between calls to status()
+        """
+        pass
+
 class Channeled():
    """A marker type to indicate that parsl should manage a Channel for this provider"""
    channel: Channel
