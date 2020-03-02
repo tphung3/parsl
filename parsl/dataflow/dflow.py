@@ -537,7 +537,7 @@ class DataFlowKernel(object):
         logger.info("Task {} launched on executor {}".format(task_id, executor.label))
         return exec_fu
 
-    def _add_input_deps(self, executor: str, args: Tuple[Any, ...], kwargs: Dict[str, Any], func: Callable) -> Tuple[Tuple[Any, ...], Dict[str, Any], Callable]:
+    def _add_input_deps(self, executor: str, args: Sequence[Any], kwargs: Dict[str, Any], func: Callable) -> Tuple[Sequence[Any], Dict[str, Any], Callable]:
         """Look for inputs of the app that are files. Give the data manager
         the opportunity to replace a file with a data future for that file,
         for example wrapping the result of a staging action.
@@ -568,7 +568,7 @@ class DataFlowKernel(object):
 
         return tuple(newargs), kwargs, func
 
-    def _add_output_deps(self, executor: str, args: Tuple[Any, ...], kwargs: Dict[str, Any], app_fut: AppFuture, func: Callable) -> Callable:
+    def _add_output_deps(self, executor: str, args: Sequence[Any], kwargs: Dict[str, Any], app_fut: AppFuture, func: Callable) -> Callable:
         logger.debug("Adding output dependencies")
         outputs = kwargs.get('outputs', [])
         app_fut._outputs = []
@@ -603,7 +603,7 @@ class DataFlowKernel(object):
                 app_fut._outputs.append(DataFuture(app_fut, f, tid=app_fut.tid))
         return func
 
-    def _gather_all_deps(self, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> List[Any]: # this should be a list of Futures-with-a-tid-annotation-on-them which would need a protocol class change. see sanitize_and_wrap for a place where expecting any future to have a tid too.
+    def _gather_all_deps(self, args: Sequence[Any], kwargs: Dict[str, Any]) -> List[Any]: # this should be a list of Futures-with-a-tid-annotation-on-them which would need a protocol class change. see sanitize_and_wrap for a place where expecting any future to have a tid too.
         """Count the number of unresolved futures on which a task depends.
 
         Args:
@@ -692,7 +692,7 @@ class DataFlowKernel(object):
 
         return new_args, kwargs, dep_failures
 
-    def submit(self, func: Callable, *args: Sequence[Any], executors: Union[str, List[str]] ='all', fn_hash: Optional[str] =None, cache: bool =False, **kwargs: Any) -> AppFuture:
+    def submit(self, func: Callable, app_args: Sequence[Any], executors: Union[str, List[str]] ='all', fn_hash: Optional[str] =None, cache: bool =False, app_kwargs: Dict[str, Any]={}) -> AppFuture:
         """Add task to the dataflow system.
 
         If the app task has the executors attributes not set (default=='all')
@@ -707,15 +707,15 @@ class DataFlowKernel(object):
 
         Args:
             - func : A function object
-            - *args : Args to the function
 
         KWargs :
+            - app_args : Args to the function
             - executors (list or string) : List of executors this call could go to.
                     Default='all'
             - fn_hash (Str) : Hash of the function and inputs
                     Default=None
             - cache (Bool) : To enable memoization or not
-            - kwargs (dict) : Rest of the kwargs to the fn passed as dict.
+            - app_kwargs (dict) : Rest of the kwargs to the fn passed as dict.
 
         Returns:
                (AppFuture) [DataFutures,]
@@ -737,19 +737,19 @@ class DataFlowKernel(object):
 
         # The below uses func.__name__ before it has been wrapped by any staging code.
 
-        label = kwargs.get('label')
+        label = app_kwargs.get('label')
         for kw in ['stdout', 'stderr']:
-            if kw in kwargs:
-                if kwargs[kw] == parsl.AUTO_LOGNAME:
-                    kwargs[kw] = os.path.join(
-                            self.run_dir,
-                            'task_logs',
-                            str(int(task_id / 10000)).zfill(4),  # limit logs to 10k entries per directory
-                            'task_{}_{}{}.{}'.format(
-                                str(task_id).zfill(4),
-                                func.__name__,
-                                '' if label is None else '_{}'.format(label),
-                                kw)
+            if kw in app_kwargs:
+                if app_kwargs[kw] == parsl.AUTO_LOGNAME:
+                    app_kwargs[kw] = os.path.join(
+                                self.run_dir,
+                                'task_logs',
+                                str(int(task_id / 10000)).zfill(4),  # limit logs to 10k entries per directory
+                                'task_{}_{}{}.{}'.format(
+                                    str(task_id).zfill(4),
+                                    func.__name__,
+                                    '' if label is None else '_{}'.format(label),
+                                    kw)
                     )
 
         task_def = {'executor': executor,
@@ -767,14 +767,14 @@ class DataFlowKernel(object):
         app_fu = AppFuture(task_def)
 
         # Transform remote input files to data futures
-        args, kwargs, func = self._add_input_deps(executor, args, kwargs, func)
+        app_args, app_kwargs, func = self._add_input_deps(executor, app_args, app_kwargs, func)
 
-        func = self._add_output_deps(executor, args, kwargs, app_fu, func)
+        func = self._add_output_deps(executor, app_args, app_kwargs, app_fu, func)
 
         task_def.update({
-                    'args': args,
+                    'args': app_args,
                     'func': func,
-                    'kwargs': kwargs,
+                    'kwargs': app_kwargs,
                     'app_fu': app_fu})
 
         if task_id in self.tasks:
@@ -784,7 +784,7 @@ class DataFlowKernel(object):
             self.tasks[task_id] = task_def
 
         # Get the list of dependencies for the task
-        depends = self._gather_all_deps(args, kwargs)
+        depends = self._gather_all_deps(app_args, app_kwargs)
         self.tasks[task_id]['depends'] = depends
 
         depend_descs = []
