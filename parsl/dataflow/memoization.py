@@ -185,8 +185,7 @@ class Memoizer(object):
             - task(task) : task from the dfk.tasks table
 
         Returns:
-            Tuple of the following:
-            - Result (Py Obj): Result of the function if present in table, wrapped in a Future
+            - Result of the function if present in table, wrapped in a Future
 
         This call will also set task['hashsum'] to the unique hashsum for the func+inputs.
         """
