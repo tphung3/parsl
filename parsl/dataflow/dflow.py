@@ -211,6 +211,7 @@ class DataFlowKernel(object):
         task_log_info["task_func_name"] = self.tasks[task_id]['func_name']
         task_log_info["task_fn_hash"] = self.tasks[task_id]['fn_hash']
         task_log_info["task_memoize"] = self.tasks[task_id]['memoize']
+        task_log_info["task_hashsum"] = self.tasks[task_id]['memoize']
         task_log_info["task_fail_count"] = self.tasks[task_id]['fail_count']
         task_log_info["task_status"] = self.tasks[task_id]['status']
         task_log_info["task_id"] = self.tasks[task_id]['id']
@@ -756,6 +757,7 @@ class DataFlowKernel(object):
                     'func_name': func.__name__,
                     'fn_hash': fn_hash,
                     'memoize': cache,
+                    'hashsum': None,
                     'exec_fu': None,
                     'fail_count': 0,
                     'fail_history': [],
