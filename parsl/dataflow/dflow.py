@@ -363,10 +363,7 @@ class DataFlowKernel(object):
                 self.tasks[task_id]['app_fu'].set_result(future.result())
 
             except Exception as e:
-                # we're getting a callabck where future is an arbitrary Future (from the executor) and we've assumed that parsl has decorated it somehow with a retries_left attibute... but the type system doesn't reflect that. TODO: use some protocol based retries_left detection, or perhaps move the retries count into the task record rather than the executor future?
-                detyped_future = cast(Any, future)
-
-                if detyped_future.retries_left > 0:
+                if self.tasks[task_id]['retries_left'] > 0:
                     # ignore this exception, because assume some later
                     # parent executor, started external to this class,
                     # will provide the answer
@@ -465,8 +462,8 @@ class DataFlowKernel(object):
                     task_log_info = self._create_task_log_info(task_id, 'lazy')
                     self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
+                self.tasks[task_id]['retries_left'] = 0
                 exec_fu = Future()
-                exec_fu.retries_left = 0  # type: ignore
                 exec_fu.set_exception(DependencyError(exceptions,
                                                       task_id,
                                                       None))
@@ -530,10 +527,7 @@ class DataFlowKernel(object):
             task_log_info = self._create_task_log_info(task_id, 'lazy')
             self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
-        # exec_fu is an arbitrary future so it doesn't have a retries_left attribute
-        # see notes about this elsewhere about moving that value into the task structure
-        # out of the exec future
-        cast(Any, exec_fu).retries_left = self._config.retries - \
+        self.tasks[task_id]['retries_left'] = self._config.retries - \
             self.tasks[task_id]['fail_count']
         logger.info("Task {} launched on executor {}".format(task_id, executor.label))
         return exec_fu
