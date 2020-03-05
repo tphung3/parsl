@@ -693,7 +693,7 @@ class DataFlowKernel(object):
 
         return new_args, kwargs, dep_failures
 
-    def submit(self, func: Callable, app_args: Sequence[Any], executors: Union[str, List[str]] ='all', fn_hash: Optional[str] =None, cache: bool =False, app_kwargs: Dict[str, Any]={}) -> AppFuture:
+    def submit(self, func: Callable, app_args: Sequence[Any], executors: Union[str, List[str]] ='all', fn_hash: Optional[str] =None, cache: bool =False, ignore_for_cache: List[str] = [], app_kwargs: Dict[str, Any]={}) -> AppFuture:
         """Add task to the dataflow system.
 
         If the app task has the executors attributes not set (default=='all')
@@ -716,6 +716,7 @@ class DataFlowKernel(object):
             - fn_hash (Str) : Hash of the function and inputs
                     Default=None
             - cache (Bool) : To enable memoization or not
+            - ignore_for_cache (list) : List of kwargs to be ignored for memoization/checkpointing
             - app_kwargs (dict) : Rest of the kwargs to the fn passed as dict.
 
         Returns:
@@ -761,6 +762,7 @@ class DataFlowKernel(object):
                     'exec_fu': None,
                     'fail_count': 0,
                     'fail_history': [],
+                    'ignore_for_cache': ignore_for_cache,
                     'status': States.unsched,
                     'id': task_id,
                     'time_submitted': None,

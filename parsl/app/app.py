@@ -28,7 +28,7 @@ class AppBase(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, func, data_flow_kernel: "Optional[DataFlowKernel]" = None, executors='all', cache: bool = False) -> None:
+    def __init__(self, func, data_flow_kernel: "Optional[DataFlowKernel]" = None, executors='all', cache: bool = False, ignore_for_cache=[]) -> None:
         """Construct the App object.
 
         Args:
@@ -51,6 +51,7 @@ class AppBase(metaclass=ABCMeta):
         self.status = 'created'
         self.executors = executors
         self.cache = cache
+        self.ignore_for_cache = ignore_for_cache
         if not (isinstance(executors, list) or isinstance(executors, str)):
             logger.error("App {} specifies invalid executor option, expects string or list".format(
                 func.__name__))
@@ -83,7 +84,7 @@ class AppBase(metaclass=ABCMeta):
         pass
 
 
-def python_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors='all'):
+def python_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors='all', ignore_for_cache: List[str]=[]):
     """Decorator function for making python apps.
 
     Parameters
@@ -108,14 +109,15 @@ def python_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = Non
             return PythonApp(f,
                              data_flow_kernel=data_flow_kernel,
                              cache=cache,
-                             executors=executors)
+                             executors=executors,
+                             ignore_for_cache=ignore_for_cache)
         return wrapper(func)
     if function is not None:
         return decorator(function)
     return decorator
 
 
-def bash_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors='all'):
+def bash_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors='all', ignore_for_cache=[]):
     """Decorator function for making bash apps.
 
     Parameters
@@ -142,7 +144,8 @@ def bash_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None,
             return BashApp(f,
                            data_flow_kernel=data_flow_kernel,
                            cache=cache,
-                           executors=executors)
+                           executors=executors,
+                           ignore_for_cache=ignore_for_cache)
         return wrapper(func)
     if function is not None:
         return decorator(function)
