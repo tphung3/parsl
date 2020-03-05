@@ -5,10 +5,11 @@ import logging
 from parsl.executors.serialize.serialize import serialize_object
 from parsl.dataflow.taskrecord import TaskRecord
 
-from typing import Dict, Any, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Dict, Any, List, Optional, Tuple, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from parsl import DataFlowKernel # import loop at runtime - needed for typechecking - TODO turn into "if typing:"
+
 from concurrent.futures import Future
 
 import types
@@ -157,7 +158,7 @@ class Memoizer(object):
         """
         # Function name TODO: Add fn body later
 
-        t = []
+        t = []  # type: List[bytes]
 
         # if kwargs contains an outputs parameter, that parameter is removed
         # and normalised differently - with output_ref set to True.

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from typing import Type
     from typing import Dict
     from typing import Any
+    from typing import List
     from typing import Optional
     from parsl.dataflow.dflow import DataFlowKernel
 

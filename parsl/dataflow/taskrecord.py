@@ -24,6 +24,7 @@ class TaskRecord(TypedDict, total=False):
 
     executor : str
 
+    retries_left : int
     fail_count : int
     fail_history : List[Any]
 
@@ -44,5 +45,6 @@ class TaskRecord(TypedDict, total=False):
     time_returned : Optional[datetime.datetime]
 
     memoize : bool
-    id : int
+    ignore_for_cache : Sequence[str]
 
+    id : int
