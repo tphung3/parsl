@@ -10,7 +10,7 @@ from parsl.utils import RepresentationMixin
 
 logger = logging.getLogger(__name__)
 
-from typing import Dict, Tuple, Optional
+from typing import Dict, IO, Tuple, Optional
 
 class LocalChannel(Channel, RepresentationMixin):
     ''' This is not even really a channel, since opening a local shell is not heavy
@@ -70,8 +70,22 @@ class LocalChannel(Channel, RepresentationMixin):
                 preexec_fn=os.setpgrp
             )
             proc.wait(timeout=walltime)
-            stdout = proc.stdout.read()
-            stderr = proc.stderr.read()
+            # BENC: for type purposes, stdout and stderr might be None,
+            # even though in this case, I'd hope that they'd be
+            # pipes because of subprocess.PIPE above...
+
+            stdout_stream = proc.stdout
+            if isinstance(stdout_stream, IO):
+                stdout = stdout_stream.read()
+            else:
+                raise RuntimeError("stdout unreadable")
+
+            stderr_stream = proc.stderr
+            if isinstance(stderr_stream, IO):
+                stderr = stderr_stream.read()
+            else:
+                raise RuntimeError("stderr unreadable")
+
             retcode = proc.returncode
 
         except Exception as e:
