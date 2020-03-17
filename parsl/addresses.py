@@ -15,7 +15,7 @@ import fcntl
 import struct
 import psutil
 
-from typing import Set
+from typing import cast, Any, Set
 
 logger = logging.getLogger(__name__)
 
@@ -73,11 +73,15 @@ def address_by_interface(ifname: str) -> str:
 
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
+
+    # with mypy 0.770, the ioctl type is wrong for how it is being invoked
+    # here, but the python documentation seems to say this usage is ok.
+    # so cast to Any to override the (wrong?) types
+    return socket.inet_ntoa(cast(Any, fcntl.ioctl)(
         s.fileno(),
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', bytes(ifname[:15], 'utf-8'))
-    )[20:24])
+    )[20:24])  
 
 
 def get_all_addresses() -> Set[str]:
