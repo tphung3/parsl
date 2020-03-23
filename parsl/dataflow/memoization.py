@@ -5,10 +5,10 @@ import logging
 from parsl.executors.serialize.serialize import serialize_object
 from parsl.dataflow.taskrecord import TaskRecord
 
-from typing import Dict, Any, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Dict, Any, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from parsl import DataFlowKernel # import loop at runtime - needed for typechecking - TODO turn into "if typing:"
+    from parsl import DataFlowKernel  # import loop at runtime - needed for typechecking - TODO turn into "if typing:"
 
 from concurrent.futures import Future
 
@@ -122,7 +122,7 @@ class Memoizer(object):
 
     """
 
-    def __init__(self, dfk: "DataFlowKernel", memoize: bool=True, checkpoint: 'Dict[str, Future[Any]]'={}):
+    def __init__(self, dfk: "DataFlowKernel", memoize: bool = True, checkpoint: 'Dict[str, Future[Any]]' = {}):
         """Initialize the memoizer.
 
         Args:
@@ -141,7 +141,6 @@ class Memoizer(object):
         else:
             logger.info("App caching disabled for all apps")
             self.memo_lookup_table = {}
-
 
     def make_hash(self, task: TaskRecord) -> str:
         """Create a hash of the task inputs.

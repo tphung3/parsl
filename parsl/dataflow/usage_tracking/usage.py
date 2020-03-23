@@ -10,7 +10,7 @@ import sys
 import platform
 import multiprocessing as mp
 
-from typing import Any, List
+from typing import List
 
 from parsl.dataflow.states import FINAL_FAILURE_STATES
 from parsl.version import VERSION as PARSL_VERSION
