@@ -11,16 +11,15 @@ import threading
 import sys
 import datetime
 from getpass import getuser
-from typing import Optional
-from typing_extensions import TypedDict
 from uuid import uuid4
 from socket import gethostname
 from concurrent.futures import Future
 from functools import partial
 
-# only for type checking:
+# mostly for type checking
 from typing import Any, Callable, Dict, Iterable, Optional, Union, List, Sequence, Tuple
 from parsl.channels.base import Channel
+from parsl.executors.base import ParslExecutor
 from parsl.providers.provider_base import Channeled, MultiChanneled, ExecutionProvider
 
 import parsl
@@ -34,10 +33,9 @@ from parsl.dataflow.flow_control import FlowControl, Timer
 from parsl.dataflow.futures import AppFuture
 from parsl.dataflow.memoization import Memoizer
 from parsl.dataflow.rundirs import make_rundir
-from parsl.dataflow.states import States, FINAL_FAILURE_STATES
+from parsl.dataflow.states import States
 from parsl.dataflow.taskrecord import TaskRecord
 from parsl.dataflow.usage_tracking.usage import UsageTracker
-from parsl.executors.base import ParslExecutor # for mypy
 from parsl.executors.threads import ThreadPoolExecutor
 from parsl.utils import get_version, get_std_fname_mode
 
@@ -45,6 +43,7 @@ from parsl.monitoring.message_type import MessageType
 
 
 logger = logging.getLogger(__name__)
+
 
 class DataFlowKernel(object):
     """The DataFlowKernel adds dependency awareness to an existing executor.
@@ -65,7 +64,7 @@ class DataFlowKernel(object):
 
     """
 
-    def __init__(self, config: Config =Config()) -> None:
+    def __init__(self, config: Config = Config()) -> None:
         """Initialize the DataFlowKernel.
 
         Parameters
@@ -117,7 +116,7 @@ class DataFlowKernel(object):
             self.hub_interchange_port = self.monitoring.start(self.run_id)
 
         self.time_began = datetime.datetime.now()
-        self.time_completed = None # type: Optional[datetime.datetime]
+        self.time_completed = None  # type: Optional[datetime.datetime]
 
         # TODO: make configurable
         logger.info("Run id is: " + self.run_id)
@@ -173,7 +172,7 @@ class DataFlowKernel(object):
         # flowcontrol.add_executors.
         self.flowcontrol = FlowControl(self)
 
-        self.executors = {} # type: Dict[str, ParslExecutor]
+        self.executors = {}  # type: Dict[str, ParslExecutor]
         self.data_manager = DataManager(self)
         data_manager_executor = ThreadPoolExecutor(max_threads=config.data_management_max_threads, label='data_manager')
         self.add_executors(config.executors + [data_manager_executor])
@@ -194,7 +193,7 @@ class DataFlowKernel(object):
                 self._checkpoint_timer = Timer(self.checkpoint, interval=(30 * 60), name="Checkpoint")
 
         self.task_count = 0
-        self.tasks = {} # type: Dict[int, TaskRecord]
+        self.tasks = {}  # type: Dict[int, TaskRecord]
         self.submitter_lock = threading.Lock()
 
         atexit.register(self.atexit_cleanup)
@@ -208,7 +207,7 @@ class DataFlowKernel(object):
         # can't do enough type checking if just iterating over this list of keys to copy
         # and the assignments need to be written out explicitly.
 
-        task_log_info = {} # type: Dict[str, Any]
+        task_log_info = {}  # type: Dict[str, Any]
 
         task_log_info["task_func_name"] = self.tasks[task_id]['func_name']
         task_log_info["task_fn_hash"] = self.tasks[task_id]['fn_hash']
@@ -247,8 +246,7 @@ class DataFlowKernel(object):
         if self.tasks[task_id]['fail_history'] is not None:
             task_log_info['task_fail_history'] = ",".join(self.tasks[task_id]['fail_history'])
         task_log_info['task_depends'] = None
-        task_log_info['task_depends'] = ",".join([str(t.tid) for t in self.tasks[task_id]['depends']
-                                                      if isinstance(t, AppFuture) or isinstance(t, DataFuture)])
+        task_log_info['task_depends'] = ",".join([str(t.tid) for t in self.tasks[task_id]['depends'] if isinstance(t, AppFuture) or isinstance(t, DataFuture)])
         task_log_info['task_elapsed_time'] = None
 
         # explicit variables for None reasoning

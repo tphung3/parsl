@@ -32,7 +32,7 @@ def get_version() -> str:
     return version
 
 
-def get_all_checkpoints(rundir: str ="runinfo") -> List[str]:
+def get_all_checkpoints(rundir: str = "runinfo") -> List[str]:
     """Finds the checkpoints from all last runs.
 
     Note that checkpoints are incremental, and this helper will not find
@@ -65,7 +65,7 @@ def get_all_checkpoints(rundir: str ="runinfo") -> List[str]:
     return checkpoints
 
 
-def get_last_checkpoint(rundir: str ="runinfo") -> List[str]:
+def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
     """Finds the checkpoint from the last run, if one exists.
 
     Note that checkpoints are incremental, and this helper will not find

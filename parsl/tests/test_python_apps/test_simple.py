@@ -4,6 +4,7 @@ from concurrent.futures import Future
 
 from typing import Dict, Union
 
+
 @python_app
 def increment(x):
     return x + 1
@@ -17,7 +18,7 @@ def slow_increment(x, dur):
 
 
 def test_increment(depth=5):
-    futs = {0: 0} # type: Dict[int, Union[int, Future]]
+    futs = {0: 0}  # type: Dict[int, Union[int, Future]]
     for i in range(1, depth):
         futs[i] = increment(futs[i - 1])
 
@@ -29,7 +30,7 @@ def test_increment(depth=5):
 
 
 def test_slow_increment(depth=5):
-    futs = {0: 0} # type: Dict[int, Union[int, Future]]
+    futs = {0: 0}  # type: Dict[int, Union[int, Future]]
     for i in range(1, depth):
         futs[i] = slow_increment(futs[i - 1], 0.01)
 

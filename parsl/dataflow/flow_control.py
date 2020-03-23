@@ -48,7 +48,7 @@ class FlowControl(object):
     from a duplicate logger being added by the thread.
     """
 
-    def __init__(self, dfk: "DataFlowKernel", *args, threshold: int =20, interval: int =5) -> None:
+    def __init__(self, dfk: "DataFlowKernel", *args, threshold: int = 20, interval: int = 5) -> None:
         """Initialize the flowcontrol object.
 
         We start the timer thread here
@@ -68,7 +68,7 @@ class FlowControl(object):
         self.callback = self.task_status_poller.poll
         self._handle = None
         self._event_count = 0
-        self._event_buffer = [] # type: List[str]
+        self._event_buffer = []  # type: List[str]
         self._wake_up_time = time.time() + 1
         self._kill_event = threading.Event()
         self._thread = threading.Thread(target=self._wake_up_timer, args=(self._kill_event,), name="FlowControl-Thread")
@@ -106,7 +106,7 @@ class FlowControl(object):
             logger.debug("Eventcount >= threshold")
             self.make_callback(kind="event")
 
-    def make_callback(self, kind: Optional[str] =None) -> None:
+    def make_callback(self, kind: Optional[str] = None) -> None:
         """Makes the callback and resets the timer.
 
         KWargs:
