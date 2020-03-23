@@ -86,7 +86,11 @@ class AppBase(metaclass=ABCMeta):
         pass
 
 
-def python_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors='all', ignore_for_cache: List[str]=[]):
+def python_app(function=None,
+               data_flow_kernel: "Optional[DataFlowKernel]" = None,
+               cache: bool = False,
+               executors='all',
+               ignore_for_cache: List[str] = []):
     """Decorator function for making python apps.
 
     Parameters
@@ -119,7 +123,11 @@ def python_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = Non
     return decorator
 
 
-def bash_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors: Union[List[str], Literal['all']] = 'all', ignore_for_cache: List[str] = []):
+def bash_app(function=None,
+             data_flow_kernel: "Optional[DataFlowKernel]" = None,
+             cache: bool = False,
+             executors: Union[List[str], Literal['all']] = 'all',
+             ignore_for_cache: List[str] = []):
     """Decorator function for making bash apps.
 
     Parameters
