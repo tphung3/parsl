@@ -8,9 +8,10 @@ from parsl.providers.provider_base import ExecutionProvider, Channeled
 
 logger = logging.getLogger(__name__)
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict
 from parsl.channels.base import Channel
 from parsl.launchers.launchers import Launcher
+
 
 class ClusterProvider(ExecutionProvider, Channeled):
     """ This class defines behavior common to all cluster/supercompute-style scheduler systems.
@@ -54,10 +55,10 @@ class ClusterProvider(ExecutionProvider, Channeled):
                  init_blocks: int,
                  min_blocks: int,
                  max_blocks: int,
-                 parallelism: float, # nb. the member field for this is used by strategy, so maybe this should be exposed at the layer above as a property?
+                 parallelism: float,  # nb. the member field for this is used by strategy, so maybe this should be exposed at the layer above as a property?
                  walltime: str,
                  launcher: Launcher,
-                 cmd_timeout: int =10) -> None:
+                 cmd_timeout: int = 10) -> None:
 
         self._label = label
         self.channel = channel
@@ -80,7 +81,7 @@ class ClusterProvider(ExecutionProvider, Channeled):
         self.script_dir = None
 
         # Dictionary that keeps track of jobs, keyed on job_id
-        self.resources = {} # type: Dict[Any, Any]
+        self.resources = {}  # type: Dict[Any, Any]
 
     # This annotation breaks slurm:
     # parsl/providers/slurm/slurm.py:201: error: Item "None" of "Optional[str]" has no attribute "split"

@@ -1,9 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from enum import Enum
-from typing import Any, List, Optional
-
-# for typechecking:
 from typing import Any, Dict, List, Optional
+
 from parsl.channels.base import Channel
 
 
@@ -82,9 +80,8 @@ class ExecutionProvider(metaclass=ABCMeta):
     init_blocks: int
     nodes_per_block: int
     script_dir: Optional[str]
-    parallelism: float #TODO not sure about this one?
-    resources: Dict[Any, Any] # I think the contents of this are provider-specific?    
-
+    parallelism: float  # TODO not sure about this one?
+    resources: Dict[Any, Any]  # I think the contents of this are provider-specific?
 
     @abstractmethod
     def submit(self, command: str, tasks_per_node: int, job_name: str = "parsl.auto") -> Any:
@@ -149,7 +146,6 @@ class ExecutionProvider(metaclass=ABCMeta):
         ''' Provides the label for this provider '''
         pass
 
-
     @property
     def mem_per_node(self) -> Optional[float]:
         """Real memory to provision per node in GB.
@@ -195,10 +191,12 @@ class ExecutionProvider(metaclass=ABCMeta):
         """
         pass
 
+
 class Channeled():
-   """A marker type to indicate that parsl should manage a Channel for this provider"""
-   channel: Channel
+    """A marker type to indicate that parsl should manage a Channel for this provider"""
+    channel: Channel
+
 
 class MultiChanneled():
-   """A marker type to indicate that parsl should manage Channels for this provider"""
-   channels: List[Channel]
+    """A marker type to indicate that parsl should manage Channels for this provider"""
+    channels: List[Channel]

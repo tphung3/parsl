@@ -70,19 +70,19 @@ class TorqueProvider(ClusterProvider, RepresentationMixin):
 
     """
     def __init__(self,
-                 channel: Channel =LocalChannel(),
-                 account: Optional[str] =None,
-                 queue: Optional[str] =None,
-                 scheduler_options: str='',
-                 worker_init: str='',
-                 nodes_per_block: int =1,
-                 init_blocks: int =1,
-                 min_blocks: int =0,
-                 max_blocks: int =100,
-                 parallelism: float =1,
-                 launcher: Launcher =AprunLauncher(),
-                 walltime: str ="00:20:00",
-                 cmd_timeout: int =120) -> None:
+                 channel: Channel = LocalChannel(),
+                 account: Optional[str] = None,
+                 queue: Optional[str] = None,
+                 scheduler_options: str = '',
+                 worker_init: str = '',
+                 nodes_per_block: int = 1,
+                 init_blocks: int = 1,
+                 min_blocks: int = 0,
+                 max_blocks: int = 100,
+                 parallelism: float = 1,
+                 launcher: Launcher = AprunLauncher(),
+                 walltime: str = "00:20:00",
+                 cmd_timeout: int = 120) -> None:
         label = 'torque'
         super().__init__(label,
                          channel,
