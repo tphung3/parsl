@@ -13,6 +13,7 @@ from ipyparallel.serialize import deserialize_object
 
 from parsl.app.errors import RemoteExceptionWrapper
 from parsl.executors.high_throughput import zmq_pipes
+from parsl.executors.base import HasConnectedWorkers
 from parsl.executors.high_throughput import interchange
 from parsl.executors.errors import BadMessage, ScalingFailed, DeserializationError
 from parsl.executors.status_handling import StatusHandlingExecutor
@@ -30,7 +31,7 @@ ITEM_THRESHOLD = 1024
 
 from typing import Any, Dict, List, Union
 
-class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin):
+class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasConnectedWorkers):
     """Executor designed for cluster-scale
 
     The HighThroughputExecutor system has the following components:

@@ -193,3 +193,8 @@ class ParslExecutor(metaclass=ABCMeta):
     @hub_port.setter
     def hub_port(self, value: Optional[int]) -> None:
         self._hub_port = value
+
+
+class HasConnectedWorkers():
+   """A marker type to indicate that the executor has a count of connected workers"""
+   connected_workers: int

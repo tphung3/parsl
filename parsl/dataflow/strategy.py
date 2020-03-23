@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from parsl.dataflow.dflow import DataFlowKernel
 
-from parsl.executors.base import ParslExecutor
+from parsl.executors.base import ParslExecutor, HasConnectedWorkers
 
 from typing import Dict
 from typing import Any
@@ -16,7 +16,6 @@ from typing import Callable
 from typing import List
 from typing import Optional
 from typing import Sequence
-from typing import cast
 
 # this is used for testing a class to decide how to
 # print a status line. That might be better done inside
@@ -225,7 +224,7 @@ class Strategy(object):
             active_blocks = running + pending
             active_slots = active_blocks * tasks_per_node * nodes_per_block
 
-            if hasattr(executor, 'connected_workers'):
+            if isinstance(executor, HasConnectedWorkers):
 
                 # mypy is not able to infer that executor has a
                 # .connected_workers attribute from the above if statement,
@@ -238,10 +237,9 @@ class Strategy(object):
                 # print its own statistics status rather than any ad-hoc
                 # behaviour change here.
                 # mypy issue https://github.com/python/mypy/issues/1424
-                detyped_executor = cast(Any, executor)
 
                 logger.debug('Executor {} has {} active tasks, {}/{} running/pending blocks, and {} connected workers'.format(
-                    label, active_tasks, running, pending, detyped_executor.connected_workers))
+                    label, active_tasks, running, pending, executor.connected_workers))
             else:
                 logger.debug('Executor {} has {} active tasks and {}/{} running/pending blocks'.format(
                     label, active_tasks, running, pending))
