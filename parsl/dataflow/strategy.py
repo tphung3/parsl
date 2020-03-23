@@ -13,7 +13,6 @@ from parsl.executors.base import ParslExecutor, HasConnectedWorkers
 from typing import Dict
 from typing import Any
 from typing import Callable
-from typing import List
 from typing import Optional
 from typing import Sequence
 
@@ -33,6 +32,7 @@ from parsl.executors import HighThroughputExecutor, ExtremeScaleExecutor
 from parsl.providers.provider_base import JobState
 
 logger = logging.getLogger(__name__)
+
 
 class Strategy(object):
     """FlowControl strategy.
@@ -136,15 +136,19 @@ class Strategy(object):
         """Initialize strategy."""
         self.dfk = dfk
         self.config = dfk.config
-        self.executors = {} # type: Dict[str, Dict[str, Any]]
+        self.executors = {}  # type: Dict[str, Dict[str, Any]]
         self.max_idletime = self.dfk.config.max_idletime
 
         for e in self.dfk.config.executors:
             self.executors[e.label] = {'idle_since': None, 'config': e.label}
 
-        self.strategies = {None: self._strategy_noop, 'simple': self._strategy_simple} # type: Dict[Optional[str], Callable]
+        self.strategies = {None: self._strategy_noop, 'simple': self._strategy_simple}  # type: Dict[Optional[str], Callable]
 
-        # mypy note: with mypy 0.761, the type of self.strategize is correctly revealed inside this module, but isn't carried over when Strategy is used in other modules unless this specific type annotation is used.
+        # mypy note: with mypy 0.761, the type of self.strategize is
+        # correctly revealed inside this module, but isn't carried over
+        #  when Strategy is used in other modules unless this specific
+        # type annotation is used.
+
         self.strategize = self.strategies[self.config.strategy]   # type: Callable
         self.logger_flag = False
         self.prior_loghandlers = set(logging.getLogger().handlers)
@@ -155,7 +159,7 @@ class Strategy(object):
         for executor in executors:
             self.executors[executor.label] = {'idle_since': None, 'config': executor.label}
 
-    def _strategy_noop(self, status: List[ExecutorStatus], tasks, kind: Optional[str] =None) -> None:
+    def _strategy_noop(self, status: List[ExecutorStatus], tasks, kind: Optional[str] = None) -> None:
         """Do nothing.
 
         Args:
@@ -179,7 +183,7 @@ class Strategy(object):
 
         self.logger_flag = True
 
-    def _strategy_simple(self, status_list: List[ExecutorStatus], tasks, kind: Optional[str] =None) -> None:
+    def _strategy_simple(self, status_list: List[ExecutorStatus], tasks, kind: Optional[str] = None) -> None:
         """Peek at the DFK and the executors specified.
 
         We assume here that tasks are not held in a runnable
