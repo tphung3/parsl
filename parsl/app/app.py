@@ -9,14 +9,15 @@ from hashlib import md5
 from inspect import signature
 
 from typing import TYPE_CHECKING
+from typing import Union
+from typing import List
+from typing_extensions import Literal
+
 if TYPE_CHECKING:
     from typing import Dict
     from typing import Any
-    from typing import List
     from typing import Optional
-    from typing import Union
     from parsl.dataflow.dflow import DataFlowKernel
-    from typing_extensions import Literal
 
 
 logger = logging.getLogger(__name__)
