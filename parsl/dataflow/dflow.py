@@ -596,7 +596,7 @@ class DataFlowKernel(object):
                 app_fut._outputs.append(DataFuture(app_fut, f, tid=app_fut.tid))
         return func
 
-    def _gather_all_deps(self, args: Sequence[Any], kwargs: Dict[str, Any]) -> List[Future]: # this should be a list of Futures-with-a-tid-annotation-on-them which would need a protocol class change. see sanitize_and_wrap for a place where expecting any future to have a tid too.
+    def _gather_all_deps(self, args: Sequence[Any], kwargs: Dict[str, Any]) -> List[Future]:
         """Count the number of unresolved futures on which a task depends.
 
         Args:
@@ -627,7 +627,6 @@ class DataFlowKernel(object):
             check_dep(dep)
 
         return depends
-
 
     def sanitize_and_wrap(self, task_id: int, args: Sequence[Any], kwargs: Dict[str, Any]) -> Tuple[List[Any], Dict[str, Any], List[Exception]]:
         """This function should be called only when all the futures we track have been resolved.
