@@ -19,7 +19,7 @@ from concurrent.futures import Future
 from functools import partial
 
 # only for type checking:
-from typing import Any, Callable, Dict, Iterable, Optional, Union, List, Sequence, Tuple, cast
+from typing import Any, Callable, Dict, Iterable, Optional, Union, List, Sequence, Tuple
 from parsl.channels.base import Channel
 from parsl.providers.provider_base import Channeled, MultiChanneled, ExecutionProvider
 
