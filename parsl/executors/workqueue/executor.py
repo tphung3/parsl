@@ -204,7 +204,7 @@ def WorkQueueSubmitThread(task_queue=multiprocessing.Queue(),
             except Exception as e:
                 logger.error("Unable to create task: {}".format(e))
 
-                msg : Optional[Dict[str, Any]]
+                msg: Optional[Dict[str, Any]]
                 msg = {"tid": parsl_id,
                        "result_received": False,
                        "reason": "Workqueue Task Start Failure",

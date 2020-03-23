@@ -25,7 +25,7 @@ from parsl.app.errors import RemoteExceptionWrapper
 from parsl.executors.high_throughput.errors import WorkerLost
 from parsl.executors.high_throughput.probe import probe_addresses
 
-mpQueue : Type
+mpQueue: Type
 
 if platform.system() == 'Darwin':
     from parsl.executors.high_throughput.mac_safe_queue import MacSafeQueue as mpQueue
