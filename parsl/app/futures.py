@@ -1,14 +1,10 @@
 """This module implements DataFutures.
 """
-import os
 import logging
 from concurrent.futures import Future
 
-from parsl.dataflow.futures import _STATE_TO_DESCRIPTION_MAP, FINISHED
 from parsl.app.errors import NotFutureError
 from parsl.data_provider.files import File
-
-from parsl.dataflow.futures import AppFuture
 
 from typing import Optional
 
