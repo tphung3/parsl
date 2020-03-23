@@ -10,12 +10,13 @@ from inspect import signature
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type
     from typing import Dict
     from typing import Any
     from typing import List
     from typing import Optional
+    from typing import Union
     from parsl.dataflow.dflow import DataFlowKernel
+    from typing_extensions import Literal
 
 
 logger = logging.getLogger(__name__)
@@ -118,7 +119,7 @@ def python_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = Non
     return decorator
 
 
-def bash_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors='all', ignore_for_cache=[]):
+def bash_app(function=None, data_flow_kernel: "Optional[DataFlowKernel]" = None, cache: bool = False, executors: Union[List[str], Literal['all']] = 'all', ignore_for_cache: List[str] = []):
     """Decorator function for making bash apps.
 
     Parameters
