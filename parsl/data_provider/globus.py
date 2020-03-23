@@ -61,6 +61,8 @@ class Globus(object):
 
     authorizer = None
 
+    TOKEN_FILE: str
+
     @classmethod
     def init(cls):
         token_path = os.path.join(os.path.expanduser('~'), '.parsl')
