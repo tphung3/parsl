@@ -4,9 +4,10 @@ import sys
 import threading
 import time
 
+from parsl.executors.base import ParslExecutor
 from parsl.dataflow.task_status_poller import TaskStatusPoller
 
-from typing import List, Optional
+from typing import Any, Callable, List, Optional, Sequence, Tuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from parsl.dataflow.dflow import DataFlowKernel
@@ -48,7 +49,7 @@ class FlowControl(object):
     from a duplicate logger being added by the thread.
     """
 
-    def __init__(self, dfk: "DataFlowKernel", *args, threshold: int = 20, interval: int = 5) -> None:
+    def __init__(self, dfk: "DataFlowKernel", *args: Tuple[Any, ...], threshold: int = 20, interval: int = 5) -> None:
         """Initialize the flowcontrol object.
 
         We start the timer thread here
@@ -75,7 +76,7 @@ class FlowControl(object):
         self._thread.daemon = True
         self._thread.start()
 
-    def _wake_up_timer(self, kill_event):
+    def _wake_up_timer(self, kill_event: threading.Event) -> None:
         """Internal. This is the function that the thread will execute.
         waits on an event so that the thread can make a quick exit when close() is called
 
@@ -120,10 +121,10 @@ class FlowControl(object):
             logger.error("Flow control callback threw an exception - logging and proceeding anyway", exc_info=True)
         self._event_buffer = []
 
-    def add_executors(self, executors):
+    def add_executors(self, executors: Sequence[ParslExecutor]) -> None:
         self.task_status_poller.add_executors(executors)
 
-    def close(self):
+    def close(self) -> None:
         """Merge the threads and terminate."""
         self._kill_event.set()
         self._thread.join()
@@ -149,7 +150,8 @@ class Timer(object):
 
     """
 
-    def __init__(self, callback, *args, interval=5, name=None):
+    # TODO: some kind of dependentish type here? eg Callable[X] and args has type X?
+    def __init__(self, callback: Callable, *args: Tuple[Any, ...], interval: float = 5, name: Optional[str] = None) -> None:
         """Initialize the flowcontrol object
         We start the timer thread here
 
@@ -176,7 +178,7 @@ class Timer(object):
         self._thread.daemon = True
         self._thread.start()
 
-    def _wake_up_timer(self, kill_event):
+    def _wake_up_timer(self, kill_event: threading.Event) -> None:
         """Internal. This is the function that the thread will execute.
         waits on an event so that the thread can make a quick exit when close() is called
 
@@ -200,48 +202,14 @@ class Timer(object):
             else:
                 print("Sleeping a bit more")
 
-    def make_callback(self, kind=None):
+    def make_callback(self, kind: Optional[str] = None) -> None:
         """Makes the callback and resets the timer.
         """
         self._wake_up_time = time.time() + self.interval
         self.callback(*self.cb_args)
 
-    def close(self):
+    def close(self) -> None:
         """Merge the threads and terminate.
         """
         self._kill_event.set()
         self._thread.join()
-
-
-if __name__ == "__main__":
-
-    def foo():
-        print("Callback made at :", time.time())
-
-    timer = Timer(foo)
-
-    time.sleep(60)
-    timer.close()
-    exit(0)
-
-    print("This is broken")
-
-    def cback(*args):
-        print("*" * 40)
-        print("Callback at {0} with args : {1}".format(time.time(), args))
-        print("*" * 40)
-
-    fc = FlowControl(cback)
-
-    print("Testing")
-    print("Press E(Enter) to create and event, X(Enter) to exit")
-    while True:
-        x = sys.stdin.read(1)
-        if x.lower() == 'e':
-            print("Event")
-            fc.notify()
-        elif x.lower() == 'x':
-            print("Exiting ...")
-            break
-        else:
-            print("Continuing.. got[%s]", x)
