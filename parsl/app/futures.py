@@ -8,6 +8,10 @@ from parsl.dataflow.futures import _STATE_TO_DESCRIPTION_MAP, FINISHED
 from parsl.app.errors import NotFutureError
 from parsl.data_provider.files import File
 
+from parsl.dataflow.futures import AppFuture
+
+from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,7 +42,7 @@ class DataFuture(Future):
         else:
             self.set_result(self.file_obj)
 
-    def __init__(self, fut, file_obj, tid=None):
+    def __init__(self, fut: Future, file_obj: File, tid: Optional[int] = None) -> None:
         """Construct the DataFuture object.
 
         If the file_obj is a string convert to a File.
@@ -52,10 +56,7 @@ class DataFuture(Future):
         """
         super().__init__()
         self._tid = tid
-        if isinstance(file_obj, str):
-            logger.warning("DataFuture constructed with a string, not a File. This is deprecated.")
-            self.file_obj = File(file_obj)
-        elif isinstance(file_obj, File):
+        if isinstance(file_obj, File):
             self.file_obj = file_obj
         else:
             raise ValueError("DataFuture must be initialized with a str or File")
@@ -99,62 +100,7 @@ class DataFuture(Future):
             return False
 
     def __repr__(self):
-
-        parent = self.parent
-
-        if parent:
-            with parent._condition:
-                if parent._state == FINISHED:
-                    if parent._exception:
-                        return '<%s at %#x state=%s raised %s>' % (
-                            self.__class__.__name__,
-                            id(self),
-                            _STATE_TO_DESCRIPTION_MAP[parent._state],
-                            parent._exception.__class__.__name__)
-                    else:
-                        return '<%s at %#x state=%s with file %s>' % (
-                            self.__class__.__name__,
-                            id(self),
-                            _STATE_TO_DESCRIPTION_MAP[parent._state],
-                            repr(self.file_obj))
-                return '<%s at %#x state=%s>' % (
-                    self.__class__.__name__,
-                    id(self),
-                    _STATE_TO_DESCRIPTION_MAP[parent._state])
-
-        else:
-            return '<%s at %#x state=%s>' % (
-                self.__class__.__name__,
-                id(self),
-                _STATE_TO_DESCRIPTION_MAP[self._state])
-
-
-def testing_nonfuture():
-    fpath = '~/shuffled.txt'
-    df = DataFuture(None, fpath)
-    print(df)
-    print("Result: ", df.filepath)
-    assert df.filepath == os.path.abspath(os.path.expanduser(fpath))
-
-
-if __name__ == "__main__":
-    # logging.basicConfig(filename='futures.testing.log',level=logging.DEBUG)
-    import sys
-    import random
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    logger.debug("Begin Testing")
-
-    with open('shuffled.txt', 'w') as testfile:
-        nums = list(range(0, 10000))
-        random.shuffle(nums)
-        for item in nums:
-            testfile.write("{0}\n".format(item))
-
-    foo = Future()  # type: Future[str]
-    df = DataFuture(foo, './shuffled.txt')
-    dx = DataFuture(foo, '~/shuffled.txt')
-
-    print(foo.done())
-    print(df.done())
-
-    testing_nonfuture()
+        return '<%s file=%s super=%s>' % (
+            self.__class__.__name__,
+            repr(self.file_obj),
+            super().__repr__())
