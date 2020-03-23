@@ -1,7 +1,7 @@
 import logging
 import parsl
 import time
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 
 from parsl.dataflow.executor_status import ExecutorStatus
 from parsl.dataflow.strategy import Strategy
@@ -18,10 +18,10 @@ class PollItem(ExecutorStatus):
         self._last_poll_time = 0.0
         self._status = {}  # type: Dict[object, JobStatus]
 
-    def _should_poll(self, now: float):
+    def _should_poll(self, now: float) -> bool:
         return now >= self._last_poll_time + self._interval
 
-    def poll(self, now: float):
+    def poll(self, now: float) -> None:
         if self._should_poll(now):
             logger.debug("Polling {}".format(self._executor))
             self._status = self._executor.status()
@@ -35,7 +35,7 @@ class PollItem(ExecutorStatus):
     def executor(self) -> ParslExecutor:
         return self._executor
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self._status.__repr__()
 
 
@@ -44,17 +44,17 @@ class TaskStatusPoller(object):
         self._poll_items = []  # type: List[PollItem]
         self._strategy = Strategy(dfk)
 
-    def poll(self, tasks=None, kind=None):
+    def poll(self, tasks: Optional[List[str]] = None, kind: Optional[str] = None) -> None:
         logger.debug("Polling")
         self._update_state()
         self._strategy.strategize(self._poll_items, tasks)
 
-    def _update_state(self):
+    def _update_state(self) -> None:
         now = time.time()
         for item in self._poll_items:
             item.poll(now)
 
-    def add_executors(self, executors: Sequence[ParslExecutor]):
+    def add_executors(self, executors: Sequence[ParslExecutor]) -> None:
         for executor in executors:
             if executor.status_polling_interval > 0:
                 logger.debug("Adding executor {}".format(executor))
