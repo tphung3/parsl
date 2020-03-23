@@ -122,7 +122,7 @@ class ClusterProvider(ExecutionProvider, Channeled):
 
         except KeyError as e:
             logger.error("Missing keys for submit script : %s", e)
-            raise (SchedulerMissingArgs(e.args, self.sitename))
+            raise (SchedulerMissingArgs(e.args, self.label))
 
         except IOError as e:
             logger.error("Failed writing to submit script: %s", script_filename)
