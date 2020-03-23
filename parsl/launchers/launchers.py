@@ -3,9 +3,8 @@ import logging
 
 from parsl.utils import RepresentationMixin
 
-from typing import Optional
-
 logger = logging.getLogger(__name__)
+
 
 class Launcher(RepresentationMixin, metaclass=ABCMeta):
     """ Launcher base class to enforce launcher interface

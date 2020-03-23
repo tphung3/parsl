@@ -208,10 +208,8 @@ class Memoizer(object):
 
         hashsum = self.make_hash(task)
         logger.debug("Task {} has memoization hash {}".format(task_id, hashsum))
-        present = False
         result = None
         if hashsum in self.memo_lookup_table:
-            present = True
             result = self.memo_lookup_table[hashsum]
             logger.info("Task %s using result from cache", task_id)
         else:
