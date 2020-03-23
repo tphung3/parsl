@@ -100,13 +100,14 @@ class LocalProvider(ExecutionProvider, RepresentationMixin, Channeled):
 
                 retcode, stdout, stderr = self.channel.execute_wait('ps -p {} > /dev/null 2> /dev/null; echo "STATUS:$?" '.format(
                     self.resources[job_id]['remote_pid']), self.cmd_timeout)
-                for line in stdout.split('\n'):
-                    if line.startswith("STATUS:"):
-                        status = line.split("STATUS:")[1].strip()
-                        if status == "0":
-                            self.resources[job_id]['status'] = JobStatus(JobState.RUNNING)
-                        else:
-                            self.resources[job_id]['status'] = JobStatus(JobState.FAILED)
+                if stdout:  # (is not none)
+                    for line in stdout.split('\n'):
+                        if line.startswith("STATUS:"):
+                            status = line.split("STATUS:")[1].strip()
+                            if status == "0":
+                                self.resources[job_id]['status'] = JobStatus(JobState.RUNNING)
+                            else:
+                                self.resources[job_id]['status'] = JobStatus(JobState.FAILED)
 
         return [self.resources[jid]['status'] for jid in job_ids]
 
@@ -189,10 +190,11 @@ class LocalProvider(ExecutionProvider, RepresentationMixin, Channeled):
             # Bash would return until the streams are closed. So we redirect to a outs file
             cmd = 'bash {0} > {0}.out 2>&1 & \n echo "PID:$!" '.format(script_path)
             retcode, stdout, stderr = self.channel.execute_wait(cmd, self.cmd_timeout)
-            for line in stdout.split('\n'):
-                if line.startswith("PID:"):
-                    remote_pid = line.split("PID:")[1].strip()
-                    job_id = remote_pid
+            if stdout:
+                for line in stdout.split('\n'):
+                    if line.startswith("PID:"):
+                        remote_pid = line.split("PID:")[1].strip()
+                        job_id = remote_pid
             if job_id is None:
                 logger.warning("Channel failed to start remote command/retrieve PID")
         else:
