@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @singledispatch
-def id_for_memo(obj, output_ref=False):
+def id_for_memo(obj: object, output_ref: bool = False) -> bytes:
     """This should return a byte sequence which identifies the supplied
     value for memoization purposes: for any two calls of id_for_memo,
     the byte sequence should be the same when the "same" value is supplied,
@@ -55,12 +55,12 @@ def id_for_memo(obj, output_ref=False):
 @id_for_memo.register(float)
 @id_for_memo.register(types.FunctionType)
 @id_for_memo.register(type(None))
-def id_for_memo_serialize(obj, output_ref=False):
+def id_for_memo_serialize(obj: object, output_ref: bool = False) -> bytes:
     return serialize_object(obj)[0]
 
 
 @id_for_memo.register(list)
-def id_for_memo_list(denormalized_list, output_ref=False):
+def id_for_memo_list(denormalized_list: list, output_ref: bool = False) -> bytes:
     if type(denormalized_list) != list:
         raise ValueError("id_for_memo_list cannot work on subclasses of list")
 
@@ -73,7 +73,7 @@ def id_for_memo_list(denormalized_list, output_ref=False):
 
 
 @id_for_memo.register(dict)
-def id_for_memo_dict(denormalized_dict, output_ref=False):
+def id_for_memo_dict(denormalized_dict: dict, output_ref: bool = False) -> bytes:
     """This normalises the keys and values of the supplied dictionary.
 
     When output_ref=True, the values are normalised as output refs, but
