@@ -89,7 +89,7 @@ class AppBase(metaclass=ABCMeta):
 def python_app(function=None,
                data_flow_kernel: "Optional[DataFlowKernel]" = None,
                cache: bool = False,
-               executors='all',
+               executors: Union[List[str], Literal['all']] = 'all',
                ignore_for_cache: List[str] = []):
     """Decorator function for making python apps.
 
