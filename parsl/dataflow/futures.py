@@ -10,7 +10,10 @@ from concurrent.futures import Future
 import logging
 import threading
 
-from typing import List
+from typing import List, Optional
+
+from parsl.dataflow.taskrecord import TaskRecord
+from parsl.app.futures import DataFuture
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +60,7 @@ class AppFuture(Future):
 
     """
 
-    def __init__(self, task_def):
+    def __init__(self, task_def: TaskRecord) -> None:
         """Initialize the AppFuture.
 
         Args:
@@ -68,32 +71,32 @@ class AppFuture(Future):
         """
         super().__init__()
         self._update_lock = threading.Lock()
-        self._outputs = []  # type: List[Future]
+        self._outputs = []  # type: List[DataFuture]
         self.task_def = task_def
 
     @property
-    def stdout(self):
+    def stdout(self) -> Optional[str]:
         return self.task_def['kwargs'].get('stdout')
 
     @property
-    def stderr(self):
+    def stderr(self) -> Optional[str]:
         return self.task_def['kwargs'].get('stderr')
 
     @property
-    def tid(self):
+    def tid(self) -> int:
         return self.task_def['id']
 
-    def cancel(self):
+    def cancel(self) -> bool:
         raise NotImplementedError("Cancel not implemented")
 
-    def cancelled(self):
+    def cancelled(self) -> bool:
         return False
 
     @property
-    def outputs(self):
+    def outputs(self) -> List[DataFuture]:
         return self._outputs
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<%s super=%s>' % (
             self.__class__.__name__,
             super().__repr__())
