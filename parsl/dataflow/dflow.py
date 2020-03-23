@@ -259,16 +259,15 @@ class DataFlowKernel(object):
         task_log_info['task_fail_mode'] = fail_mode
         return task_log_info
 
-    def _count_deps(self, depends: List[object]) -> int:
+    def _count_deps(self, depends: Sequence[Future]) -> int:
         """Internal.
 
         Count the number of unresolved futures in the list depends.
         """
         count = 0
         for dep in depends:
-            if isinstance(dep, Future):
-                if not dep.done():
-                    count += 1
+            if not dep.done():
+                count += 1
 
         return count
 
@@ -597,7 +596,7 @@ class DataFlowKernel(object):
                 app_fut._outputs.append(DataFuture(app_fut, f, tid=app_fut.tid))
         return func
 
-    def _gather_all_deps(self, args: Sequence[Any], kwargs: Dict[str, Any]) -> List[Any]: # this should be a list of Futures-with-a-tid-annotation-on-them which would need a protocol class change. see sanitize_and_wrap for a place where expecting any future to have a tid too.
+    def _gather_all_deps(self, args: Sequence[Any], kwargs: Dict[str, Any]) -> List[Future]: # this should be a list of Futures-with-a-tid-annotation-on-them which would need a protocol class change. see sanitize_and_wrap for a place where expecting any future to have a tid too.
         """Count the number of unresolved futures on which a task depends.
 
         Args:
