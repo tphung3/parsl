@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 from typing import Dict, IO, Tuple, Optional
 
+
 class LocalChannel(Channel, RepresentationMixin):
     ''' This is not even really a channel, since opening a local shell is not heavy
     and done so infrequently that they do not need a persistent channel
@@ -33,7 +34,7 @@ class LocalChannel(Channel, RepresentationMixin):
         self._envs.update(envs)
         self.script_dir = script_dir
 
-    def execute_wait(self, cmd: str, walltime: Optional[int] = None, envs: Dict[str,str] ={}) -> Tuple[int, Optional[str], Optional[str]]:
+    def execute_wait(self, cmd: str, walltime: Optional[int] = None, envs: Dict[str, str] = {}) -> Tuple[int, Optional[str], Optional[str]]:
         ''' Synchronously execute a commandline string on the shell.
 
         Args:

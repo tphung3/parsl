@@ -194,12 +194,12 @@ class AdHocProvider(ExecutionProvider, MultiChanneled, RepresentationMixin):
                 logger.debug("Channel execute failed for: {}, {}".format(channel, e))
                 raise
 
-        d                      = {'job_id': job_id,
-                                  'status': JobStatus(JobState.RUNNING),
-                                  'cmd': final_cmd,
-                                  'channel': channel,
-                                  'remote_pid': remote_pid,
-                                  'proc': proc} # type: Dict[str, Any]
+        d = {'job_id': job_id,
+             'status': JobStatus(JobState.RUNNING),
+             'cmd': final_cmd,
+             'channel': channel,
+             'remote_pid': remote_pid,
+             'proc': proc}  # type: Dict[str, Any]
 
         self.resources[job_id] = d
 

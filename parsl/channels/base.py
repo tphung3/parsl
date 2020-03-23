@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 
 from typing import Any, Dict, Optional, Tuple
 
+
 class Channel(metaclass=ABCMeta):
     """ Define the interface to all channels. Channels are usually called via the execute_wait function.
     For channels that execute remotely, a push_file function allows you to copy over files.
@@ -30,7 +31,7 @@ class Channel(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def execute_wait(self, cmd: str, walltime: int, envs: Dict[str,str] ={}) -> Tuple[int, Optional[str], Optional[str]]:
+    def execute_wait(self, cmd: str, walltime: int, envs: Dict[str, str] = {}) -> Tuple[int, Optional[str], Optional[str]]:
         ''' Executes the cmd, with a defined walltime.
 
         Args:
@@ -67,7 +68,7 @@ class Channel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def execute_no_wait(self, cmd: str, walltime: int, envs: Dict[str,str] = {}) -> Any:
+    def execute_no_wait(self, cmd: str, walltime: int, envs: Dict[str, str] = {}) -> Any:
         ''' Optional. This is infrequently used.
 
         Args:
@@ -111,7 +112,7 @@ class Channel(metaclass=ABCMeta):
 
     # probable bug here - that mode default should maybe be octal 511?
     @abstractmethod
-    def makedirs(self, path: str, mode: int=511, exist_ok: bool=False) -> None:
+    def makedirs(self, path: str, mode: int = 511, exist_ok: bool = False) -> None:
         """Create a directory.
 
         If intermediate directories do not exist, they will be created.

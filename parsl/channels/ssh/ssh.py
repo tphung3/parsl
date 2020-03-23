@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 from typing import Any, Dict, Tuple, Optional
 
+
 class NoAuthSSHClient(paramiko.SSHClient):
     def _auth(self, username, *args):
         self._transport.auth_none(username)
@@ -98,7 +99,7 @@ class SSHChannel(Channel, RepresentationMixin):
             return 'env {0} {1}'.format(env_vars, cmd)
         return cmd
 
-    def execute_wait(self, cmd: str, walltime: int =2, envs: Dict[str,str] ={}) -> Tuple[int, Optional[str], Optional[str]]:
+    def execute_wait(self, cmd: str, walltime: int = 2, envs: Dict[str, str] = {}) -> Tuple[int, Optional[str], Optional[str]]:
         ''' Synchronously execute a commandline string on the shell.
 
         Args:
