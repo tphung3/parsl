@@ -6,7 +6,7 @@ import subprocess
 import time
 from contextlib import contextmanager
 
-from typing import List
+from typing import Any, List, cast
 
 import parsl
 from parsl.version import VERSION
@@ -179,7 +179,7 @@ class RepresentationMixin(object):
     __max_width__ = 80
 
     def __repr__(self):
-        init = self.__init__
+        init = type(self).__init__ # does this change from self.__init__ work?
 
         # This test looks for a single layer of wrapping performed by
         # functools.update_wrapper, commonly used in decorators. This will
@@ -190,7 +190,7 @@ class RepresentationMixin(object):
         # functools.update_wrapper.
 
         if hasattr(init, '__wrapped__'):
-            init = init.__wrapped__
+            init = cast(Any, init).__wrapped__  # could make a __wrapped__ protocol to check instance?
 
         argspec = inspect.getfullargspec(init)
         if len(argspec.args) > 1 and argspec.defaults is not None:
