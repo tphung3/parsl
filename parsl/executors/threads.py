@@ -93,6 +93,6 @@ class ThreadPoolExecutor(NoStatusHandlingExecutor, RepresentationMixin):
             - block (Bool): To block for confirmations or not
 
         """
-        x = self.executor.shutdown(wait=block)
+        self.executor.shutdown(wait=block)
         logger.debug("Done with executor shutdown")
-        return x
+        return True
