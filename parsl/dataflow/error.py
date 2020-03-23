@@ -1,3 +1,5 @@
+from typing import List
+
 class DataFlowException(Exception):
     """Base class for all exceptions.
 
@@ -27,13 +29,13 @@ class BadCheckpoint(DataFlowException):
     dependent_exceptions
     """
 
-    def __init__(self, reason):
+    def __init__(self, reason: str) -> None:
         self.reason = reason
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.reason
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
 
@@ -49,13 +51,13 @@ class DependencyError(DataFlowException):
     dependent_exceptions
     """
 
-    def __init__(self, dependent_exceptions, task_id):
+    def __init__(self, dependent_exceptions: List[Exception], task_id: int) -> None:
         self.dependent_exceptions = dependent_exceptions
         self.task_id = task_id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "[{}] Dependency failure from: {}".format(self.task_id,
                                                          self.dependent_exceptions)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
