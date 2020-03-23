@@ -35,7 +35,7 @@ script:
     - (for test in parsl/tests/configs/*.py parsl/tests/test*/test*; do mypy $test ; export PytestReturnCode=$? ; echo pytest return code is $PytestReturnCode ; if [[ "$PytestReturnCode" != 0 ]] ; then exit 1; fi; done ) ;
     - parsl/tests/lint-inits.sh
 
-    - mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/threads.py parsl/executors/base.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/utils.py
+    - mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/threads.py parsl/executors/base.py parsl/executors/ipp*py parsl/executors/status_handling.py parsl/executors/errors.py parsl/executors/__init__.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/utils.py
 
     # tests do not pass mypy
     # - MYPYPATH=$(pwd)/mypy-stubs mypy parsl/tests/test*/
