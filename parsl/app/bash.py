@@ -2,7 +2,9 @@ from functools import update_wrapper
 from inspect import signature, Parameter
 
 # for typing
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
+
+from typing_extensions import Literal
 
 from parsl.app.errors import wrap_error
 from parsl.app.app import AppBase
@@ -117,7 +119,7 @@ def remote_side_bash_executor(func, *args, **kwargs) -> int:
 
 class BashApp(AppBase):
 
-    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, cache: bool = False, executors='all', ignore_for_cache=[]) -> None:
+    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, cache: bool = False, executors: Union[List[str], Literal['all']] = 'all', ignore_for_cache: List[str] = []) -> None:
         super().__init__(func, data_flow_kernel=data_flow_kernel, executors=executors, cache=cache, ignore_for_cache=ignore_for_cache)
         self.kwargs = {}
 
