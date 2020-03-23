@@ -644,7 +644,9 @@ class DataFlowKernel(object):
              partial function evaluated with all dependencies in  args, kwargs and kwargs['inputs'] evaluated.
 
 
-        TODO: mypy note: we take a *tuple* of args but return a *list* of args. That's an (unintentional?) change of type of arg structure which leads me to try to represent the args in TaskRecord as a Sequence 
+        TODO: mypy note: we take a *tuple* of args but return a *list* of args.
+        That's an (unintentional?) change of type of arg structure which leads me
+        to try to represent the args in TaskRecord as a Sequence
 
         """
         dep_failures = []
@@ -685,7 +687,14 @@ class DataFlowKernel(object):
 
         return new_args, kwargs, dep_failures
 
-    def submit(self, func: Callable, app_args: Sequence[Any], executors: Union[str, List[str]] ='all', fn_hash: Optional[str] =None, cache: bool =False, ignore_for_cache: List[str] = [], app_kwargs: Dict[str, Any]={}) -> AppFuture:
+    def submit(self,
+               func: Callable,
+               app_args: Sequence[Any],
+               executors: Union[str, List[str]] = 'all',
+               fn_hash: Optional[str] = None,
+               cache: bool = False,
+               ignore_for_cache: List[str] = [],
+               app_kwargs: Dict[str, Any] = {}) -> AppFuture:
         """Add task to the dataflow system.
 
         If the app task has the executors attributes not set (default=='all')
@@ -900,7 +909,9 @@ class DataFlowKernel(object):
                     elif isinstance(executor.provider, Channeled):
                         self._create_remote_dirs_over_channel(executor.provider, executor.provider.channel)
                     else:
-                        raise ValueError("Assuming executor.provider has channel(s) based on it having provider/script_dir, but actually it isn't a (Multi)Channeled instance. provider = {}".format(executor.provider))
+                        raise ValueError(("Assuming executor.provider has channel(s) based on it "
+                                          "having provider/script_dir, but actually it isn't a "
+                                          "(Multi)Channeled instance. provider = {}").format(executor.provider))
 
             self.executors[executor.label] = executor
             executor.start()
@@ -984,7 +995,7 @@ class DataFlowKernel(object):
 
         logger.info("DFK cleanup complete")
 
-    def checkpoint(self, tasks: Optional[List[int]]=None) -> str:
+    def checkpoint(self, tasks: Optional[List[int]] = None) -> str:
         """Checkpoint the dfk incrementally to a checkpoint file.
 
         When called, every task that has been completed yet not
@@ -1036,7 +1047,7 @@ class DataFlowKernel(object):
                             continue
                         t = {'hash': hashsum,
                              'exception': None,
-                             'result': None} # type: Dict[str, Any]
+                             'result': None}  # type: Dict[str, Any]
                         try:
                             # Asking for the result will raise an exception if
                             # the app had failed. Should we even checkpoint these?
@@ -1092,7 +1103,7 @@ class DataFlowKernel(object):
                         try:
                             data = pickle.load(f)
                             # Copy and hash only the input attributes
-                            memo_fu = Future() #  type: Future[Any]
+                            memo_fu = Future()  # type: Future[Any]
                             if data['exception']:
                                 memo_fu.set_exception(data['exception'])
                             else:
