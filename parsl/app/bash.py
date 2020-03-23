@@ -2,14 +2,14 @@ from functools import update_wrapper
 from inspect import signature, Parameter
 
 # for typing
-from typing import Any, Dict, List, Optional
-from concurrent.futures import Future
+from typing import Any, Dict, Optional
 
 from parsl.app.errors import wrap_error
 from parsl.app.app import AppBase
 from parsl.dataflow.dflow import DataFlowKernelLoader
 
-from parsl.dataflow.dflow import DataFlowKernel # only for mypy
+from parsl.dataflow.dflow import DataFlowKernel  # only for mypy
+
 
 def remote_side_bash_executor(func, *args, **kwargs) -> int:
     """Executes the supplied function with *args and **kwargs to get a
@@ -117,7 +117,7 @@ def remote_side_bash_executor(func, *args, **kwargs) -> int:
 
 class BashApp(AppBase):
 
-    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, cache: bool=False, executors='all', ignore_for_cache=[]) -> None:
+    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, cache: bool = False, executors='all', ignore_for_cache=[]) -> None:
         super().__init__(func, data_flow_kernel=data_flow_kernel, executors=executors, cache=cache, ignore_for_cache=ignore_for_cache)
         self.kwargs = {}
 

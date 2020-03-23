@@ -7,7 +7,6 @@ from parsl.providers.provider_base import ExecutionProvider
 from parsl.providers.provider_base import JobStatus
 
 
-
 class ParslExecutor(metaclass=ABCMeta):
     """Define the strict interface for all Executor classes.
 
@@ -196,5 +195,5 @@ class ParslExecutor(metaclass=ABCMeta):
 
 
 class HasConnectedWorkers():
-   """A marker type to indicate that the executor has a count of connected workers"""
-   connected_workers: int
+    """A marker type to indicate that the executor has a count of connected workers"""
+    connected_workers: int

@@ -5,7 +5,7 @@ import threading
 import queue
 import pickle
 from multiprocessing import Process, Queue
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import math
 
 from ipyparallel.serialize import pack_apply_message
@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 BUFFER_THRESHOLD = 1024 * 1024
 ITEM_THRESHOLD = 1024
 
-from typing import Any, Dict, List, Union
 
 class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasConnectedWorkers):
     """Executor designed for cluster-scale
@@ -228,7 +227,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         self.run_dir = '.'
         self.worker_logdir_root = worker_logdir_root
 
-        self._executor_exception = None # Optional[BaseException]
+        self._executor_exception = None
 
         if launch_cmd:
             self.launch_cmd = launch_cmd
@@ -418,7 +417,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         Starts the interchange process locally and uses an internal command queue to
         get the worker task and result ports that the interchange has bound to.
         """
-        comm_q = Queue(maxsize=10) # type: Queue[Any]
+        comm_q = Queue(maxsize=10)  # type: Queue[Any]
         self.queue_proc = Process(target=interchange.starter,
                                   args=(comm_q,),
                                   kwargs={"client_ports": (self.outgoing_q.port,
