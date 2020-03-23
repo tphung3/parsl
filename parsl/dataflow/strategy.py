@@ -159,7 +159,7 @@ class Strategy(object):
         for executor in executors:
             self.executors[executor.label] = {'idle_since': None, 'config': executor.label}
 
-    def _strategy_noop(self, status: List[ExecutorStatus], tasks, kind: Optional[str] = None) -> None:
+    def _strategy_noop(self, status: List[ExecutorStatus], tasks: List[int], kind: Optional[str] = None) -> None:
         """Do nothing.
 
         Args:
@@ -169,7 +169,7 @@ class Strategy(object):
             - kind (Not used)
         """
 
-    def unset_logging(self):
+    def unset_logging(self) -> None:
         """ Mute newly added handlers to the root level, right after calling executor.status
         """
         if self.logger_flag is True:
@@ -183,7 +183,7 @@ class Strategy(object):
 
         self.logger_flag = True
 
-    def _strategy_simple(self, status_list: List[ExecutorStatus], tasks, kind: Optional[str] = None) -> None:
+    def _strategy_simple(self, status_list: List[ExecutorStatus], tasks: List[int], kind: Optional[str] = None) -> None:
         """Peek at the DFK and the executors specified.
 
         We assume here that tasks are not held in a runnable
