@@ -37,8 +37,6 @@ class TaskRecord(TypedDict, total=False):
     args: Sequence[Any]  # in some places we uses a Tuple[Any, ...] and in some places a List[Any]. This is an attempt to correctly type both of those.
     kwargs: Dict[str, Any]
 
-    # env: None  # removed by PR#1517
-
     time_submitted: Optional[datetime.datetime]
     time_returned: Optional[datetime.datetime]
 
