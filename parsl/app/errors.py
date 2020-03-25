@@ -60,13 +60,11 @@ class BashAppNoReturn(AppException):
 
     Contains:
     reason(string)
-    exitcode(int)
     """
 
-    def __init__(self, reason, exitcode=-21):
+    def __init__(self, reason: str):
         super().__init__(reason)
         self.reason = reason
-        self.exitcode = exitcode
 
 
 class MissingOutputs(ParslError):
