@@ -3,12 +3,14 @@
 The App class encapsulates a generic leaf task that can be executed asynchronously.
 """
 import logging
+import typeguard
 from abc import ABCMeta, abstractmethod
 from inspect import getsource
 from hashlib import md5
 from inspect import signature
 
 from typing import TYPE_CHECKING
+from typing import Optional
 from typing import Union
 from typing import List
 from typing_extensions import Literal
@@ -16,8 +18,8 @@ from typing_extensions import Literal
 if TYPE_CHECKING:
     from typing import Dict
     from typing import Any
-    from typing import Optional
-    from parsl.dataflow.dflow import DataFlowKernel
+
+from parsl.dataflow.dflow import DataFlowKernel
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,7 @@ class AppBase(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, func, data_flow_kernel: "Optional[DataFlowKernel]" = None, executors='all', cache: bool = False, ignore_for_cache=[]) -> None:
+    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, executors='all', cache: bool = False, ignore_for_cache=[]) -> None:
         """Construct the App object.
 
         Args:
@@ -87,8 +89,9 @@ class AppBase(metaclass=ABCMeta):
         pass
 
 
+@typeguard.typechecked
 def python_app(function=None,
-               data_flow_kernel: "Optional[DataFlowKernel]" = None,
+               data_flow_kernel: Optional[DataFlowKernel] = None,
                cache: bool = False,
                executors: Union[List[str], Literal['all']] = 'all',
                ignore_for_cache: List[str] = []):
@@ -124,8 +127,9 @@ def python_app(function=None,
     return decorator
 
 
+@typeguard.typechecked
 def bash_app(function=None,
-             data_flow_kernel: "Optional[DataFlowKernel]" = None,
+             data_flow_kernel: Optional[DataFlowKernel] = None,
              cache: bool = False,
              executors: Union[List[str], Literal['all']] = 'all',
              ignore_for_cache: List[str] = []):
