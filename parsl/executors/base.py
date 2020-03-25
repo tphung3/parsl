@@ -54,7 +54,7 @@ class ParslExecutor(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def submit(self, func: Callable, *args: Any, **kwargs: Any) -> Future:
+    def submit(self, func: Callable, *args: Any, **kwargs: Dict[str, Any]) -> Future:
         """Submit.
 
         We haven't yet decided on what the args to this can be,
