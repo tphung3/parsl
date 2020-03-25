@@ -3,13 +3,13 @@
 import parsl
 from parsl import File
 from parsl import DataFlowKernel
-from parsl import DataFlowKernelLoader
+from parsl.dataflow.dflow import DataFlowKernelLoader
 from parsl.config import *
 from parsl.app.app import bash_app
 
 parsl.set_stream_logger()
 
-c = Config(executors=[ThreadPoolExecutor()])
+c = Config(executors=[parsl.ThreadPoolExecutor()])
 
 dfk = DataFlowKernel(config = c)
 
