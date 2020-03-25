@@ -25,7 +25,7 @@ class TaskRecord(TypedDict, total=False):
 
     retries_left: int
     fail_count: int
-    fail_history: List[Any]
+    fail_history: List[str]
 
     checkpoint: bool  # this change is also in #1516
     hashsum: Optional[str]  # hash for checkpointing/memoization.
