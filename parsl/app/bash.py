@@ -2,9 +2,11 @@ from functools import update_wrapper
 from inspect import signature, Parameter
 
 # for typing
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
 from typing_extensions import Literal
+
+from parsl.data_provider.files import File
 
 from parsl.app.errors import wrap_error
 from parsl.app.app import AppBase
@@ -103,10 +105,9 @@ def remote_side_bash_executor(func, *args, **kwargs) -> int:
     # TODO : Add support for globs here
 
     missing = []
-    for outputfile in kwargs.get('outputs', []):
-        fpath = outputfile
-        if type(outputfile) != str:
-            fpath = outputfile.filepath
+    outputs = cast(List[File], kwargs.get('outputs', []))
+    for outputfile in outputs:
+        fpath = outputfile.filepath
 
         if not os.path.exists(fpath):
             missing.extend([outputfile])

@@ -8,6 +8,8 @@ from typing import List
 
 from six import reraise
 
+from parsl.data_provider.files import File
+
 logger = logging.getLogger(__name__)
 
 
@@ -76,7 +78,7 @@ class MissingOutputs(ParslError):
     outputs(List of strings/files..)
     """
 
-    def __init__(self, reason: str, outputs: List[str]):
+    def __init__(self, reason: str, outputs: List[File]):
         super().__init__(reason, outputs)
         self.reason = reason
         self.outputs = outputs
