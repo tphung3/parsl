@@ -598,11 +598,11 @@ class DataFlowKernel(object):
         """Count the number of unresolved futures on which a task depends.
 
         Args:
-            - args (List[args]) : The list of args list to the fn
-            - kwargs (Dict{kwargs}) : The dict of all kwargs passed to the fn
+            - args: The list of args list to the fn
+            - kwargs: The dict of all kwargs passed to the fn
 
         Returns:
-            - count, [list of dependencies]
+            - list of dependencies
 
         """
         # Check the positional args
