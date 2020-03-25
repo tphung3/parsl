@@ -6,7 +6,7 @@ import subprocess
 import time
 from contextlib import contextmanager
 
-from typing import Any, List, cast
+from typing import Any, Callable, List, Protocol, runtime_checkable
 
 import parsl
 from parsl.version import VERSION
@@ -152,6 +152,10 @@ def wtime_to_minutes(time_string):
     return total_mins
 
 
+@runtime_checkable
+class IsWrapper(Protocol):
+    __wrapped__: Callable
+
 class RepresentationMixin(object):
     """A mixin class for adding a __repr__ method.
 
@@ -189,8 +193,8 @@ class RepresentationMixin(object):
         # decorators, or cope with other decorators which do not use
         # functools.update_wrapper.
 
-        if hasattr(init, '__wrapped__'):
-            init = cast(Any, init).__wrapped__  # could make a __wrapped__ protocol to check instance?
+        if isinstance(init, IsWrapper):
+            init = init.__wrapped__
 
         argspec = inspect.getfullargspec(init)
         if len(argspec.args) > 1 and argspec.defaults is not None:
