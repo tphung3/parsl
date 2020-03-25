@@ -55,7 +55,7 @@ class DataFuture(Future):
         if isinstance(file_obj, File):
             self.file_obj = file_obj
         else:
-            raise ValueError("DataFuture must be initialized with a str or File")
+            raise ValueError("DataFuture must be initialized with a File")
         self.parent = fut
 
         if fut is None:
