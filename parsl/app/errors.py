@@ -4,6 +4,7 @@ from functools import wraps
 import dill
 import logging
 from tblib import Traceback
+from typing import List
 
 from six import reraise
 
@@ -75,7 +76,7 @@ class MissingOutputs(ParslError):
     outputs(List of strings/files..)
     """
 
-    def __init__(self, reason, outputs):
+    def __init__(self, reason: str, outputs: List[str]):
         super().__init__(reason, outputs)
         self.reason = reason
         self.outputs = outputs
