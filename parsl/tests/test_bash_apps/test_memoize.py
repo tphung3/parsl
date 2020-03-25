@@ -6,15 +6,6 @@ from parsl import File
 from parsl.app.app import bash_app
 from parsl.tests.configs.local_threads import config
 
-from parsl.dataflow.memoization import id_for_memo
-
-# this is bad because it will register for the whole test suite
-# process, so only one registration for the whole test suite
-# makes sense if done at module level
-@id_for_memo.register(File)
-def id_for_memo_file(file: File, output_ref: bool = False):
-    return file.url
-
 
 @bash_app(cache=True)
 def fail_on_presence(outputs=[]):
