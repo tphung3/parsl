@@ -4,9 +4,11 @@ from typing_extensions import TypedDict
 from concurrent.futures import Future
 
 # only for type checking:
-from typing import Any, Callable, Dict, Optional, List, Sequence
+from typing import Any, Callable, Dict, Optional, List, Sequence, TYPE_CHECKING
 
-from parsl.dataflow.futures import AppFuture
+if TYPE_CHECKING:
+    from parsl.dataflow.futures import AppFuture
+
 from parsl.dataflow.states import States
 
 # this is the (very loose) type for the type of a parsl dfk task record
@@ -19,7 +21,7 @@ class TaskRecord(TypedDict, total=False):
     status: States
     depends: List[Future]
 
-    app_fu: AppFuture
+    app_fu: "AppFuture"
     exec_fu: Optional[Future]
     callback: None  # I think this might be unused? PR#1514 removes this field.
 

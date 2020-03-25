@@ -6,7 +6,9 @@ import subprocess
 import time
 from contextlib import contextmanager
 
-from typing import Callable, List, Protocol, runtime_checkable
+from typing import Callable, List
+
+from typing_extensions import Protocol, runtime_checkable
 
 import parsl
 from parsl.version import VERSION
