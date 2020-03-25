@@ -4,6 +4,7 @@ import os
 import shlex
 import subprocess
 import time
+import typeguard
 from contextlib import contextmanager
 
 from typing import Callable, List
@@ -16,6 +17,7 @@ from parsl.version import VERSION
 logger = logging.getLogger(__name__)
 
 
+@typeguard.typechecked
 def get_version() -> str:
     version = parsl.__version__
     work_tree = os.path.dirname(os.path.dirname(__file__))
@@ -34,6 +36,7 @@ def get_version() -> str:
     return version
 
 
+@typeguard.typechecked
 def get_all_checkpoints(rundir: str = "runinfo") -> List[str]:
     """Finds the checkpoints from all last runs.
 
@@ -67,6 +70,7 @@ def get_all_checkpoints(rundir: str = "runinfo") -> List[str]:
     return checkpoints
 
 
+@typeguard.typechecked
 def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
     """Finds the checkpoint from the last run, if one exists.
 
