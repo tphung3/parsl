@@ -11,10 +11,6 @@ if TYPE_CHECKING:
 
 from parsl.dataflow.states import States
 
-# this is the (very loose) type for the type of a parsl dfk task record
-# I want to flesh it out using PEP 589 TypedDicts
-# TaskRecord = Dict[str, Any]
-
 
 class TaskRecord(TypedDict, total=False):
     func_name: str
