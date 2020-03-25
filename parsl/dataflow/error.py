@@ -1,5 +1,6 @@
 from typing import List
 
+
 class DataFlowException(Exception):
     """Base class for all exceptions.
 

@@ -6,7 +6,7 @@ import subprocess
 import time
 from contextlib import contextmanager
 
-from typing import Any, Callable, List, Protocol, runtime_checkable
+from typing import Callable, List, Protocol, runtime_checkable
 
 import parsl
 from parsl.version import VERSION
@@ -156,6 +156,7 @@ def wtime_to_minutes(time_string):
 class IsWrapper(Protocol):
     __wrapped__: Callable
 
+
 class RepresentationMixin(object):
     """A mixin class for adding a __repr__ method.
 
@@ -183,7 +184,7 @@ class RepresentationMixin(object):
     __max_width__ = 80
 
     def __repr__(self):
-        init = type(self).__init__ # does this change from self.__init__ work?
+        init = type(self).__init__  # does this change from self.__init__ work?
 
         # This test looks for a single layer of wrapping performed by
         # functools.update_wrapper, commonly used in decorators. This will
