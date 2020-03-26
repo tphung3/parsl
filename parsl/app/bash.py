@@ -6,8 +6,6 @@ from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
-from parsl.data_provider.files import File
-
 from parsl.app.errors import wrap_error
 from parsl.app.app import AppBase
 from parsl.dataflow.dflow import DataFlowKernelLoader
