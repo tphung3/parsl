@@ -1,6 +1,7 @@
 """This module implements DataFutures.
 """
 import logging
+import typeguard
 from concurrent.futures import Future
 
 from parsl.app.errors import NotFutureError
@@ -38,6 +39,7 @@ class DataFuture(Future):
         else:
             self.set_result(self.file_obj)
 
+    @typeguard.typechecked
     def __init__(self, fut: Future, file_obj: File, tid: Optional[int] = None) -> None:
         """Construct the DataFuture object.
 
@@ -58,13 +60,7 @@ class DataFuture(Future):
             raise ValueError("DataFuture must be initialized with a File, not {}".format(type(file_obj)))
         self.parent = fut
 
-        if fut is None:
-            logger.debug("Setting result to filepath immediately since no parent future was passed")
-            self.set_result(self.file_obj)
-        elif isinstance(fut, Future):
-            self.parent.add_done_callback(self.parent_callback)
-        else:
-            raise NotFutureError("DataFuture parent must be either another Future or None")
+        self.parent.add_done_callback(self.parent_callback)
 
         logger.debug("Creating DataFuture with parent: %s and file: %s", self.parent, repr(self.file_obj))
 
