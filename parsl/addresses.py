@@ -13,6 +13,7 @@ import requests
 import socket
 import fcntl
 import struct
+import typeguard
 import psutil
 
 from typing import cast, Any, Set
@@ -61,6 +62,7 @@ def address_by_hostname() -> str:
     return addr
 
 
+@typeguard.typechecked
 def address_by_interface(ifname: str) -> str:
     """Returns the IP address of the given interface name, e.g. 'eth0'
 
