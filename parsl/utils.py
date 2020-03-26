@@ -7,7 +7,7 @@ import time
 import typeguard
 from contextlib import contextmanager
 
-from typing import Callable, List
+from typing import Callable, List, Tuple, Union
 
 from typing_extensions import Protocol, runtime_checkable
 
@@ -103,7 +103,8 @@ def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
     return [last_checkpoint]
 
 
-def get_std_fname_mode(fdname, stdfspec):
+@typeguard.typechecked
+def get_std_fname_mode(fdname: str, stdfspec: Union[None, str, Tuple[str, str]]):
     import parsl.app.errors as pe
     if stdfspec is None:
         return None, None
@@ -114,8 +115,6 @@ def get_std_fname_mode(fdname, stdfspec):
         if len(stdfspec) != 2:
             raise pe.BadStdStreamFile("std descriptor %s has incorrect tuple length %s" % (fdname, len(stdfspec)), TypeError('Bad Tuple Length'))
         fname, mode = stdfspec
-        if not isinstance(fname, str) or not isinstance(mode, str):
-            raise pe.BadStdStreamFile("std descriptor %s has unexpected type %s" % (fdname, str(type(stdfspec))), TypeError('Bad Tuple Type'))
     else:
         raise pe.BadStdStreamFile("std descriptor %s has unexpected type %s" % (fdname, str(type(stdfspec))), TypeError('Bad Tuple Type'))
     return fname, mode
