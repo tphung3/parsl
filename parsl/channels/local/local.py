@@ -10,7 +10,7 @@ from parsl.utils import RepresentationMixin
 
 logger = logging.getLogger(__name__)
 
-from typing import Dict, IO, Tuple, Optional
+from typing import Dict, Tuple, Optional
 
 
 class LocalChannel(Channel, RepresentationMixin):
@@ -76,13 +76,13 @@ class LocalChannel(Channel, RepresentationMixin):
             # pipes because of subprocess.PIPE above...
 
             stdout_stream = proc.stdout
-            if isinstance(stdout_stream, IO):
+            if stdout_stream:
                 stdout = stdout_stream.read()
             else:
                 raise RuntimeError("stdout unreadable")
 
             stderr_stream = proc.stderr
-            if isinstance(stderr_stream, IO):
+            if stderr_stream:
                 stderr = stderr_stream.read()
             else:
                 raise RuntimeError("stderr unreadable")
