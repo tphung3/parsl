@@ -2,7 +2,7 @@ from functools import update_wrapper
 from inspect import signature, Parameter
 
 # for typing
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -23,7 +23,9 @@ def remote_side_bash_executor(func, *args, **kwargs) -> int:
     import time
     import subprocess
     import logging
+    from typing import List, cast
     import parsl.app.errors as pe
+    from parsl.data_provider.files import File
     from parsl import set_file_logger
     from parsl.utils import get_std_fname_mode
 
