@@ -4,7 +4,6 @@ import logging
 import typeguard
 from concurrent.futures import Future
 
-from parsl.app.errors import NotFutureError
 from parsl.data_provider.files import File
 
 from typing import Optional
