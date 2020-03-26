@@ -49,7 +49,7 @@ def test_bad_stdout_specs(spec):
         fn.result()
     except Exception as e:
         assert isinstance(
-            e, perror.BadStdStreamFile), "Expected BadStdStreamFile, got: {0}".format(type(e))
+            e, perror.BadStdStreamFile) or isinstance(e, TypeError), "Expected BadStdStreamFile or TypeError, got: {0}".format(type(e))
     else:
         assert False, "Did not raise expected exception BadStdStreamFile"
 
