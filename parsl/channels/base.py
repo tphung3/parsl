@@ -14,9 +14,6 @@ class Channel(metaclass=ABCMeta):
           cmd, wtime    ------->|  execute_wait
           (ec, stdout, stderr)<-|---+
                                 |
-          cmd, wtime    ------->|  execute_no_wait
-          (ec, stdout, stderr)<-|---+
-                                |
           src, dst_dir  ------->|  push_file
              dst_path  <--------|----+
                                 |
@@ -65,22 +62,6 @@ class Channel(metaclass=ABCMeta):
     # DFK expects to be able to modify this, so it needs to be in the abstract class
     @script_dir.setter
     def script_dir(self, value: str) -> None:
-        pass
-
-    @abstractmethod
-    def execute_no_wait(self, cmd: str, walltime: int, envs: Dict[str, str] = {}) -> Any:
-        ''' Optional. This is infrequently used.
-
-        Args:
-            - cmd (string): Command string to execute over the channel
-            - walltime (int) : Timeout in seconds
-
-        KWargs:
-            - envs (dict) : Environment variables to push to the remote side
-
-        Returns:
-            - the type of return value is channel specific
-        '''
         pass
 
     @abstractmethod
