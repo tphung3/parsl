@@ -6,6 +6,7 @@ import subprocess
 import time
 import typeguard
 from contextlib import contextmanager
+from typing import List
 
 from typing import Callable, List, Tuple, Union
 
@@ -48,7 +49,7 @@ def get_all_checkpoints(rundir: str = "runinfo") -> List[str]:
        - rundir(str) : Path to the runinfo directory
 
     Returns:
-       - a list suitable for the checkpointFiles parameter of DataFlowKernel
+       - a list suitable for the checkpointFiles parameter of the DataFlowKernel
          constructor
 
     """
@@ -82,7 +83,7 @@ def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
        - rundir(str) : Path to the runinfo directory
 
     Returns:
-     - a list suitable for checkpointFiles parameter of DataFlowKernel
+     - a list suitable for the checkpointFiles parameter of the DataFlowKernel
        constructor, with 0 or 1 elements
 
     """

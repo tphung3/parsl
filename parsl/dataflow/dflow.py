@@ -427,7 +427,7 @@ class DataFlowKernel(object):
         task_record = self.tasks.get(task_id)
         if task_record is None:
             # assume this task has already been processed to completion
-            logger.info("Task {} has no task record. Assuming it has already been processed to completion.".format(task_id))
+            logger.debug("Task {} has no task record. Assuming it has already been processed to completion.".format(task_id))
             return
         if self._count_deps(task_record['depends']) == 0:
 
@@ -540,7 +540,8 @@ class DataFlowKernel(object):
         Returns:   args, kwargs, (replacement, wrapping) function
         """
 
-        # Return if the task is _*_stage_in
+        # Return if the task is a data management task, rather than doing
+        # data managament on it.
         if executor == 'data_manager':
             return args, kwargs, func
 
@@ -860,7 +861,7 @@ class DataFlowKernel(object):
 
         total_summarized = sum(keytasks.values())
         if total_summarized != self.task_count:
-            logger.error("Task count summarisation was inconsistent: summarised {} tasks, but task counters registered {} tasks".format(
+            logger.error("Task count summarisation was inconsistent: summarised {} tasks, but task counter registered {} tasks".format(
                 total_summarized, self.task_count))
         logger.info("End of summary")
 
