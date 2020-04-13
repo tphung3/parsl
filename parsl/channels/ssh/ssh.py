@@ -9,7 +9,7 @@ from parsl.utils import RepresentationMixin
 
 logger = logging.getLogger(__name__)
 
-from typing import Any, Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional
 
 
 class NoAuthSSHClient(paramiko.SSHClient):

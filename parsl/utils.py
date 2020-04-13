@@ -6,7 +6,6 @@ import subprocess
 import time
 import typeguard
 from contextlib import contextmanager
-from typing import List
 
 from typing import Callable, List, Tuple, Union
 
