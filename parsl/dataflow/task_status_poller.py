@@ -35,14 +35,14 @@ class PollItem(ExecutorStatus):
     def executor(self) -> ParslExecutor:
         return self._executor
 
-    def scale_in(self, n):
+    def scale_in(self, n: int) -> List[object]:
         ids = self._executor.scale_in(n)
         if ids is not None:
             for id in ids:
                 del self._status[id]
         return ids
 
-    def scale_out(self, n):
+    def scale_out(self, n: int) -> List[object]:
         ids = self._executor.scale_out(n)
         if ids is not None:
             for id in ids:

@@ -7,6 +7,7 @@ from typing import List
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from parsl.dataflow.dflow import DataFlowKernel
+    from parsl.dataflow.task_status_poller import PollItem
 
 from parsl.executors.base import ParslExecutor, HasConnectedWorkers
 
@@ -183,7 +184,7 @@ class Strategy(object):
 
         self.logger_flag = True
 
-    def _strategy_simple(self, status_list: List[ExecutorStatus], tasks: List[int], kind: Optional[str] = None) -> None:
+    def _strategy_simple(self, status_list: List["PollItem"], tasks: List[int], kind: Optional[str] = None) -> None:
         """Peek at the DFK and the executors specified.
 
         We assume here that tasks are not held in a runnable
