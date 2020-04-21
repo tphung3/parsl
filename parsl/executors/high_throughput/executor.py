@@ -572,7 +572,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                                     "Attempts to provision nodes via provider has failed"))
             self.blocks[external_block_id] = internal_block
 
-    def scale_in(self, blocks: Optional[int] = None, block_ids: List[str] = []) -> None:
+    def scale_in(self, blocks: Optional[int] = None, block_ids: List[str] = []) -> List[str]:
         """Scale in the number of active blocks by specified amount.
 
         The scale in method here is very rude. It doesn't give the workers
@@ -604,7 +604,9 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         # Now kill via provider
         to_kill = [self.blocks.pop(bid) for bid in block_ids_to_kill]
 
-        self.provider.cancel(to_kill)
+        r = self.provider.cancel(to_kill)
+
+        return self._filter_scale_in_ids(to_kill, r)
 
     def _get_job_ids(self) -> List[object]:
         return list(self.blocks.values())
