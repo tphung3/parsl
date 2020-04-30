@@ -47,10 +47,9 @@ clean_coverage:
 .PHONY: mypy
 mypy: ## run mypy checks
 	MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/configs/
-	MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/test*/
 	MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/sites/
 	MYPYPATH=$(CWD)/mypy-stubs mypy parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/
-        MYPYPATH=$(CWD)/mypy-stubs mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/threads.py parsl/executors/base.py parsl/executors/ipp*py parsl/executors/status_handling.py parsl/executors/errors.py parsl/executors/__init__.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/*py
+	MYPYPATH=$(CWD)/mypy-stubs mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/threads.py parsl/executors/base.py parsl/executors/ipp*py parsl/executors/status_handling.py parsl/executors/errors.py parsl/executors/__init__.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/*py
 
 
 .PHONY: local_thread_test
