@@ -33,7 +33,7 @@ class AppBase(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, executors='all', cache: bool = False, ignore_for_cache=[]) -> None:
+    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, executors='all', cache: bool = False, ignore_for_cache=None) -> None:
         """Construct the App object.
 
         Args:
@@ -94,7 +94,7 @@ def python_app(function=None,
                data_flow_kernel: Optional[DataFlowKernel] = None,
                cache: bool = False,
                executors: Union[List[str], Literal['all']] = 'all',
-               ignore_for_cache: List[str] = []):
+               ignore_for_cache: Optional[List[str]] = None):
     """Decorator function for making python apps.
 
     Parameters
@@ -132,7 +132,7 @@ def bash_app(function=None,
              data_flow_kernel: Optional[DataFlowKernel] = None,
              cache: bool = False,
              executors: Union[List[str], Literal['all']] = 'all',
-             ignore_for_cache: List[str] = []):
+             ignore_for_cache: Optional[List[str]] = None):
     """Decorator function for making bash apps.
 
     Parameters

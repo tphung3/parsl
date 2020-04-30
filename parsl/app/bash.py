@@ -123,7 +123,7 @@ class BashApp(AppBase):
     def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None,
                  cache: bool = False,
                  executors: Union[List[str], Literal['all']] = 'all',
-                 ignore_for_cache: List[str] = []) -> None:
+                 ignore_for_cache: Optional[List[str]] = None) -> None:
         super().__init__(func, data_flow_kernel=data_flow_kernel, executors=executors, cache=cache, ignore_for_cache=ignore_for_cache)
         self.kwargs = {}
 

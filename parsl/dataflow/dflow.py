@@ -706,7 +706,7 @@ class DataFlowKernel(object):
                executors: Union[str, List[str]] = 'all',
                fn_hash: Optional[str] = None,
                cache: bool = False,
-               ignore_for_cache: List[str] = [],
+               ignore_for_cache: Optional[List[str]] = None,
                app_kwargs: Dict[str, Any] = {}) -> AppFuture:
         """Add task to the dataflow system.
 
@@ -737,6 +737,9 @@ class DataFlowKernel(object):
                (AppFuture) [DataFutures,]
 
         """
+
+        if ignore_for_cache is None:
+            ignore_for_cache = []
 
         if self.cleanup_called:
             raise ValueError("Cannot submit to a DFK that has been cleaned up")
