@@ -184,7 +184,7 @@ class Strategy(object):
 
         self.logger_flag = True
 
-    def _strategy_simple(self, status_list: List["PollItem"], tasks: List[int], kind: Optional[str] = None) -> None:
+    def _strategy_simple(self, status_list: "List[PollItem]", tasks: List[int], kind: Optional[str] = None) -> None:
         """Peek at the DFK and the executors specified.
 
         We assume here that tasks are not held in a runnable
