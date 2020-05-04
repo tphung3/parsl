@@ -92,7 +92,7 @@ class AppFuture(Future):
     def cancelled(self) -> bool:
         return False
 
-    def task_status(self):
+    def task_status(self) -> str:
         """Returns the status of the task that will provide the value
            for this future.  This may not be in-sync with the result state
            of this future - for example, task_status might return 'done' but
