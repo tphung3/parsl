@@ -34,7 +34,6 @@ parsl.executors.ThreadPoolExecutor
       ~ThreadPoolExecutor.executor_exception
       ~ThreadPoolExecutor.hub_address
       ~ThreadPoolExecutor.hub_port
-      ~ThreadPoolExecutor.provider
       ~ThreadPoolExecutor.run_dir
       ~ThreadPoolExecutor.scaling_enabled
       ~ThreadPoolExecutor.status_polling_interval

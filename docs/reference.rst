@@ -72,7 +72,6 @@ Reference guide
     parsl.app.errors.BashAppNoReturn
     parsl.app.errors.BashExitFailure
     parsl.app.errors.MissingOutputs
-    parsl.app.errors.NotFutureError
     parsl.app.errors.ParslError
     parsl.executors.errors.ControllerError
     parsl.executors.errors.ExecutorError

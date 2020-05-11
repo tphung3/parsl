@@ -74,8 +74,6 @@ Exceptions
 
 .. autoclass:: parsl.app.errors.ParslError
 
-.. autoclass:: parsl.app.errors.NotFutureError
-
 .. autoclass:: parsl.app.errors.AppException
 
 .. autoclass:: parsl.app.errors.AppBadFormatting
