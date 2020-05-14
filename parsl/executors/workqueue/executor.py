@@ -475,6 +475,7 @@ class WorkQueueExecutor(NoStatusHandlingExecutor):
                  port=WORK_QUEUE_DEFAULT_PORT,
                  env=None,
                  shared_fs=False,
+                 storage_access=None,
                  source=False,
                  autolabel=False,
                  autolabel_window=1,
@@ -499,6 +500,7 @@ class WorkQueueExecutor(NoStatusHandlingExecutor):
         self.env = env
         self.init_command = init_command
         self.shared_fs = shared_fs
+        self.storage_access = storage_access
         self.working_dir = working_dir
         self.used_names = {}  # type: Dict[Any, Any]
         self.shared_files = set()  # type: Set[Any]
