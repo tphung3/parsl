@@ -1,6 +1,5 @@
 import hashlib
 from functools import singledispatch
-from inspect import getsource
 import logging
 from parsl.executors.serialize.serialize import serialize_object
 import types
@@ -82,22 +81,12 @@ def id_for_memo_dict(denormalized_dict, output_ref=False):
 
 
 @id_for_memo.register(types.FunctionType)
-def id_for_memo_function(function, output_ref=False):
-    """This produces function hash material using the source definition of the
-       function.
-
-       The standard serialize_object based approach cannot be used as it is
-       too sensitive to irrelevant facts such as the source line, meaning
-       a whitespace line added at the top of a source file will cause the hash
-       to change.
+def id_for_memo_func(f, output_ref=False):
+    """This will extract some, but deliberately not all, details from the function.
+    The intention is to allow the function to be modified in source file without
+    causing memoization invalidation.
     """
-
-    try:
-        fn_source = getsource(function)
-    except OSError:
-        logger.warning("Unable to get source code for app caching. Recommend creating module")
-        fn_source = function.__name__
-    return serialize_object(fn_source.encode('utf-8'))[0]
+    return serialize_object(["types.FunctionType", f.__name__, f.__module__])[0]
 
 
 class Memoizer(object):
