@@ -198,7 +198,7 @@ class DataFlowKernel(object):
 
         atexit.register(self.atexit_cleanup)
 
-    def _create_task_log_info(self, task_id: int, fail_mode: str) -> Dict[str, Any]:
+    def _create_task_log_info(self, task_id: int) -> Dict[str, Any]:
         """
         Create the dictionary that will be included in the log.
         """
@@ -252,7 +252,6 @@ class DataFlowKernel(object):
         time_submitted = self.tasks[task_id]['time_submitted']
         if time_returned is not None and time_submitted is not None:
             task_log_info['task_elapsed_time'] = (time_returned - time_submitted).total_seconds()
-        task_log_info['task_fail_mode'] = fail_mode
         return task_log_info
 
     def _count_deps(self, depends: Sequence[Future]) -> int:
@@ -304,14 +303,6 @@ class DataFlowKernel(object):
             self.tasks[task_id]['fail_history'].append(str(e))
             self.tasks[task_id]['fail_count'] += 1
 
-            if not self._config.lazy_errors:
-                logger.exception("Eager fail, skipping retry logic")
-                self.tasks[task_id]['status'] = States.failed
-                if self.monitoring:
-                    task_log_info = self._create_task_log_info(task_id, 'eager')
-                    self.monitoring.send(MessageType.TASK_INFO, task_log_info)
-                return
-
             if self.tasks[task_id]['status'] == States.dep_fail:
                 logger.info("Task {} failed due to dependency failure so skipping retries".format(task_id))
             elif self.tasks[task_id]['fail_count'] <= self._config.retries:
@@ -338,7 +329,7 @@ class DataFlowKernel(object):
             logger.info("Standard error for task {} available at {}".format(task_id, self.tasks[task_id]['app_fu'].stderr))
 
         if self.monitoring:
-            task_log_info = self._create_task_log_info(task_id, 'lazy')
+            task_log_info = self._create_task_log_info(task_id)
             self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
         # it might be that in the course of the update, we've gone back to being
@@ -466,7 +457,7 @@ class DataFlowKernel(object):
                 self.tasks_dep_fail_count += 1
 
                 if self.monitoring is not None:
-                    task_log_info = self._create_task_log_info(task_id, 'lazy')
+                    task_log_info = self._create_task_log_info(task_id)
                     self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
                 self.tasks[task_id]['retries_left'] = 0
@@ -535,7 +526,7 @@ class DataFlowKernel(object):
             exec_fu = executor.submit(executable, *args, **kwargs)
         self.tasks[task_id]['status'] = States.launched
         if self.monitoring is not None:
-            task_log_info = self._create_task_log_info(task_id, 'lazy')
+            task_log_info = self._create_task_log_info(task_id)
             self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
         self.tasks[task_id]['retries_left'] = self._config.retries - \
