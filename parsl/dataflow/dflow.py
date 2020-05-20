@@ -245,13 +245,6 @@ class DataFlowKernel(object):
         task_log_info['task_fail_history'] = ",".join(self.tasks[task_id]['fail_history'])
         task_log_info['task_depends'] = None
         task_log_info['task_depends'] = ",".join([str(t.tid) for t in self.tasks[task_id]['depends'] if isinstance(t, AppFuture) or isinstance(t, DataFuture)])
-        task_log_info['task_elapsed_time'] = None
-
-        # explicit variables for None reasoning
-        time_returned = self.tasks[task_id]['time_returned']
-        time_submitted = self.tasks[task_id]['time_submitted']
-        if time_returned is not None and time_submitted is not None:
-            task_log_info['task_elapsed_time'] = (time_returned - time_submitted).total_seconds()
         return task_log_info
 
     def _count_deps(self, depends: Sequence[Future]) -> int:

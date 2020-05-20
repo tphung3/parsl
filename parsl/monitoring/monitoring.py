@@ -61,7 +61,7 @@ def start_file_logger(filename, name='monitoring', level=logging.DEBUG, format_s
     return logger
 
 
-class UDPRadio(object):
+class UDPRadio:
 
     def __init__(self, monitoring_url, source_id=None, timeout=10):
         """
@@ -331,7 +331,7 @@ class MonitoringHub(RepresentationMixin):
         return wrapped
 
 
-class Hub(object):
+class Hub:
 
     def __init__(self,
                  hub_address,
@@ -352,7 +352,7 @@ class Hub(object):
         Parameters
         ----------
         hub_address : str
-             The ip address at which the workers will be able to reach the Hub. Default: "127.0.0.1"
+             The ip address at which the workers will be able to reach the Hub.
         hub_port : int
              The specific port at which workers will be able to reach the Hub via UDP. Default: None
         hub_port_range : tuple(int, int)
