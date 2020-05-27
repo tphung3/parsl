@@ -15,7 +15,12 @@ from parsl.app.errors import RemoteExceptionWrapper
 from parsl.executors.high_throughput import zmq_pipes
 from parsl.executors.base import HasConnectedWorkers
 from parsl.executors.high_throughput import interchange
-from parsl.executors.errors import BadMessage, ScalingFailed, DeserializationError, SerializationError
+from parsl.executors.errors import (
+    BadMessage, ScalingFailed,
+    DeserializationError, SerializationError,
+    UnsupportedFeatureError
+)
+
 from parsl.executors.status_handling import StatusHandlingExecutor
 from parsl.providers.provider_base import ExecutionProvider
 from parsl.data_provider.staging import Staging
@@ -511,7 +516,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                 logger.debug("[HOLD_BLOCK]: Sending hold to manager: {}".format(manager['manager']))
                 self.hold_worker(manager['manager'])
 
-    def submit(self, func, *args, **kwargs) -> "Future[Any]":
+    def submit(self, func, resource_specification, *args, **kwargs) -> "Future[Any]":
         """Submits work to the the outgoing_q.
 
         The outgoing_q is an external process listens on this
@@ -528,6 +533,12 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         Returns:
               Future
         """
+        if resource_specification:
+            logger.error("Ignoring the resource specification. "
+                         "Parsl resource specification is not supported in HighThroughput Executor. "
+                         "Please check WorkQueueExecutor if resource specification is needed.")
+            raise UnsupportedFeatureError('resource specification', 'HighThroughput Executor', 'WorkQueue Executor')
+
         if self.bad_state_is_set:
             if self.executor_exception is None:
                 raise ValueError("Executor is in bad state, but no exception recorded")

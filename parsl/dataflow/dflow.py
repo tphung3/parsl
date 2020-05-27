@@ -516,7 +516,7 @@ class DataFlowKernel(object):
                                                          self.monitoring.resource_monitoring_interval)
 
         with self.submitter_lock:
-            exec_fu = executor.submit(executable, *args, **kwargs)
+            exec_fu = executor.submit(executable, self.tasks[task_id]['resource_specification'], *args, **kwargs)
         self.tasks[task_id]['status'] = States.launched
         if self.monitoring is not None:
             task_log_info = self._create_task_log_info(task_id)
@@ -757,6 +757,8 @@ class DataFlowKernel(object):
                                     kw)
                     )
 
+        resource_specification = app_kwargs.get('parsl_resource_specification', {})
+
         task_def = {'executor': executor,
                     'func_name': func.__name__,
                     'fn_hash': fn_hash,
@@ -769,7 +771,8 @@ class DataFlowKernel(object):
                     'status': States.unsched,
                     'id': task_id,
                     'time_submitted': None,
-                    'time_returned': None}  # type: TaskRecord
+                    'time_returned': None,  # type: TaskRecord
+                    'resource_specification': resource_specification}
 
         app_fu = AppFuture(task_def)
 
