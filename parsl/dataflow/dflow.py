@@ -771,8 +771,8 @@ class DataFlowKernel(object):
                     'status': States.unsched,
                     'id': task_id,
                     'time_submitted': None,
-                    'time_returned': None,  # type: TaskRecord
-                    'resource_specification': resource_specification}
+                    'time_returned': None,
+                    'resource_specification': resource_specification}  # type: TaskRecord
 
         app_fu = AppFuture(task_def)
 

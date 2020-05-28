@@ -44,3 +44,5 @@ class TaskRecord(TypedDict, total=False):
     ignore_for_cache: Sequence[str]
 
     id: int
+
+    resource_specification: Dict[str, Any]
