@@ -9,7 +9,7 @@ from parsl.providers.provider_base import Channeled, ExecutionProvider, JobState
 from parsl.providers.error import SchedulerMissingArgs, ScriptPathError
 from parsl.utils import RepresentationMixin
 
-from typing import Any
+from typing import Any, List
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ class LocalProvider(ExecutionProvider, RepresentationMixin, Channeled):
         # Dictionary that keeps track of jobs, keyed on job_id
         self.resources = {}
 
-    def status(self, job_ids):
+    def status(self, job_ids: List[Any]) -> List[JobStatus]:
         '''  Get the status of a list of jobs identified by their ids.
 
         Args:

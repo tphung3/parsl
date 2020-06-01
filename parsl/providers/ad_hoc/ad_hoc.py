@@ -8,7 +8,7 @@ from parsl.providers.provider_base import ExecutionProvider, JobStatus, JobState
 from parsl.providers.error import ScriptPathError
 from parsl.utils import RepresentationMixin
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +195,7 @@ class AdHocProvider(ExecutionProvider, MultiChanneled, RepresentationMixin):
 
         return job_id
 
-    def status(self, job_ids):
+    def status(self, job_ids: List[Any]) -> List[JobStatus]:
         """ Get status of the list of jobs with job_ids
 
         Parameters

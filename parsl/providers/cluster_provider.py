@@ -4,11 +4,11 @@ from string import Template
 
 from parsl.providers.error import SchedulerMissingArgs, ScriptPathError
 from parsl.launchers.error import BadLauncher
-from parsl.providers.provider_base import ExecutionProvider, Channeled
+from parsl.providers.provider_base import ExecutionProvider, Channeled, JobStatus
 
 logger = logging.getLogger(__name__)
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 from parsl.channels.base import Channel
 from parsl.launchers.launchers import Launcher
 
@@ -140,7 +140,7 @@ class ClusterProvider(ExecutionProvider, Channeled):
     def _status(self):
         pass
 
-    def status(self, job_ids):
+    def status(self, job_ids: List[Any]) -> List[JobStatus]:
         """ Get the status of a list of jobs identified by the job identifiers
         returned from the submit request.
 
