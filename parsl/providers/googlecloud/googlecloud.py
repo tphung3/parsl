@@ -1,6 +1,7 @@
 import atexit
 import logging
 import os
+from typing import List
 from parsl.launchers import SingleNodeLauncher
 from parsl.providers.provider_base import JobState, JobStatus
 
@@ -134,7 +135,7 @@ class GoogleCloudProvider():
         self.resources[name] = {"job_id": name, "status": JobStatus(translate_table[instance['status']])}
         return name
 
-    def status(self, job_ids):
+    def status(self, job_ids) -> List[JobStatus]:
         ''' Get the status of a list of jobs identified by the job identifiers
         returned from the submit request.
 

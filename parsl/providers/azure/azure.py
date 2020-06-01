@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import time
+from typing import List
 from string import Template
 
 from parsl.dataflow.error import ConfigurationError
@@ -301,7 +302,7 @@ class AzureProvider(ExecutionProvider, RepresentationMixin):
 
         return vm_info.name
 
-    def status(self, job_ids):
+    def status(self, job_ids) -> List[JobStatus]:
         """Get the status of a list of jobs identified by their ids.
         Parameters
         ----------
