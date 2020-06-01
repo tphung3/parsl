@@ -3,6 +3,7 @@ import logging
 import os
 import time
 from string import Template
+from typing import List
 
 from parsl.dataflow.error import ConfigurationError
 from parsl.providers.aws.template import template_string
@@ -537,7 +538,7 @@ class AWSProvider(ExecutionProvider, RepresentationMixin):
             self.instance_states[instance['InstanceId']] = instance['State']['Name']
         return self.instance_states
 
-    def status(self, job_ids):
+    def status(self, job_ids) -> List[JobStatus]:
         """Get the status of a list of jobs identified by their ids.
 
         Parameters
