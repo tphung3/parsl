@@ -79,7 +79,7 @@ class TorqueProvider(ClusterProvider, RepresentationMixin):
                  nodes_per_block: int = 1,
                  init_blocks: int = 1,
                  min_blocks: int = 0,
-                 max_blocks: int = 100,
+                 max_blocks: int = 1,
                  parallelism: float = 1,
                  launcher: Launcher = AprunLauncher(),
                  walltime: str = "00:20:00",
