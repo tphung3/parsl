@@ -2,8 +2,8 @@ import json
 import logging
 import os
 import time
-from typing import List
 from string import Template
+from typing import Any, List
 
 from parsl.dataflow.error import ConfigurationError
 from parsl.providers.azure.template import template_string
@@ -11,8 +11,6 @@ from parsl.providers.provider_base import ExecutionProvider, JobState, JobStatus
 from parsl.providers.error import OptionalModuleMissing
 from parsl.utils import RepresentationMixin
 from parsl.launchers import SingleNodeLauncher
-
-from typing import Any, List
 
 logger = logging.getLogger(__name__)
 
