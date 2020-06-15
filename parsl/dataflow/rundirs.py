@@ -22,7 +22,7 @@ def make_rundir(path: str) -> str:
         if not os.path.exists(path):
             os.makedirs(path)
 
-        prev_rundirs = glob(os.path.join(path, "[0-9]*"))
+        prev_rundirs = glob(os.path.join(path, "[0-9]*[0-9]"))
 
         current_rundir = os.path.join(path, '000')
 
