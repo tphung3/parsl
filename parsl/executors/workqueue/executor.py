@@ -194,6 +194,13 @@ class WorkQueueExecutor(NoStatusHandlingExecutor):
                  full_debug: bool = True):
         NoStatusHandlingExecutor.__init__(self)
         self._provider = provider
+
+        # as benc-mypy has got rid of NoStatusHandlingExecutor.provider
+        # an accessor to _provider, instead set it here explicitly. This
+        # removes the requirement for NoStatusHandlingExecutor to provide
+        # that accessor which won't always work.
+        self.provider = provider
+
         self._scaling_enabled = True
 
         if not _work_queue_enabled:
