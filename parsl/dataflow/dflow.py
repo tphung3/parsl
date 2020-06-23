@@ -89,9 +89,6 @@ class DataFlowKernel(object):
 
         logger.debug("Starting DataFlowKernel with config\n{}".format(config))
 
-        if sys.version_info < (3, 6):
-            logger.warning("Support for python versions < 3.6 is deprecated and will be removed after parsl 0.10")
-
         logger.info("Parsl version: {}".format(get_version()))
 
         self.checkpoint_lock = threading.Lock()
@@ -146,7 +143,6 @@ class DataFlowKernel(object):
                 'parsl_version': get_version(),
                 "time_began": self.time_began,
                 'time_completed': None,
-                'workflow_duration': None,
                 'run_id': self.run_id,
                 'workflow_name': self.workflow_name,
                 'workflow_version': self.workflow_version,
@@ -198,7 +194,7 @@ class DataFlowKernel(object):
 
         atexit.register(self.atexit_cleanup)
 
-    def _create_task_log_info(self, task_id: int) -> Dict[str, Any]:
+    def _create_task_log_info(self, task_record: TaskRecord) -> Dict[str, Any]:
         """
         Create the dictionary that will be included in the log.
         """
@@ -209,42 +205,42 @@ class DataFlowKernel(object):
 
         task_log_info = {}  # type: Dict[str, Any]
 
-        task_log_info["task_func_name"] = self.tasks[task_id]['func_name']
-        task_log_info["task_fn_hash"] = self.tasks[task_id]['fn_hash']
-        task_log_info["task_memoize"] = self.tasks[task_id]['memoize']
-        task_log_info["task_hashsum"] = self.tasks[task_id]['memoize']
-        task_log_info["task_fail_count"] = self.tasks[task_id]['fail_count']
-        task_log_info["task_status"] = self.tasks[task_id]['status']
-        task_log_info["task_id"] = self.tasks[task_id]['id']
-        task_log_info["task_time_submitted"] = self.tasks[task_id]['time_submitted']
-        task_log_info["task_time_returned"] = self.tasks[task_id]['time_returned']
-        task_log_info["task_executor"] = self.tasks[task_id]['executor']
+        task_log_info["task_func_name"] = task_record['func_name']
+        task_log_info["task_fn_hash"] = task_record['fn_hash']
+        task_log_info["task_memoize"] = task_record['memoize']
+        task_log_info["task_hashsum"] = task_record['memoize']
+        task_log_info["task_fail_count"] = task_record['fail_count']
+        task_log_info["task_status"] = task_record['status']
+        task_log_info["task_id"] = task_record['id']
+        task_log_info["task_time_submitted"] = task_record['time_submitted']
+        task_log_info["task_time_returned"] = task_record['time_returned']
+        task_log_info["task_executor"] = task_record['executor']
 
         task_log_info['run_id'] = self.run_id
         task_log_info['timestamp'] = datetime.datetime.now()
-        task_log_info['task_status_name'] = self.tasks[task_id]['status'].name
+        task_log_info['task_status_name'] = task_record['status'].name
         task_log_info['tasks_failed_count'] = self.tasks_failed_count
         task_log_info['tasks_completed_count'] = self.tasks_completed_count
-        task_log_info['task_inputs'] = str(self.tasks[task_id]['kwargs'].get('inputs', None))
-        task_log_info['task_outputs'] = str(self.tasks[task_id]['kwargs'].get('outputs', None))
-        task_log_info['task_stdin'] = self.tasks[task_id]['kwargs'].get('stdin', None)
-        stdout_spec = self.tasks[task_id]['kwargs'].get('stdout', None)
-        stderr_spec = self.tasks[task_id]['kwargs'].get('stderr', None)
+        task_log_info['task_inputs'] = str(task_record['kwargs'].get('inputs', None))
+        task_log_info['task_outputs'] = str(task_record['kwargs'].get('outputs', None))
+        task_log_info['task_stdin'] = task_record['kwargs'].get('stdin', None)
+        stdout_spec = task_record['kwargs'].get('stdout', None)
+        stderr_spec = task_record['kwargs'].get('stderr', None)
         try:
             stdout_name, _ = get_std_fname_mode('stdout', stdout_spec)
         except Exception as e:
-            logger.warning("Incorrect stdout format {} for Task {}".format(stdout_spec, task_id))
+            logger.warning("Incorrect stdout format {} for Task {}".format(stdout_spec, task_record['id']))
             stdout_name = str(e)
         try:
             stderr_name, _ = get_std_fname_mode('stderr', stderr_spec)
         except Exception as e:
-            logger.warning("Incorrect stderr format {} for Task {}".format(stderr_spec, task_id))
+            logger.warning("Incorrect stderr format {} for Task {}".format(stderr_spec, task_record['id']))
             stderr_name = str(e)
         task_log_info['task_stdout'] = stdout_name
         task_log_info['task_stderr'] = stderr_name
-        task_log_info['task_fail_history'] = ",".join(self.tasks[task_id]['fail_history'])
+        task_log_info['task_fail_history'] = ",".join(task_record['fail_history'])
         task_log_info['task_depends'] = None
-        task_log_info['task_depends'] = ",".join([str(t.tid) for t in self.tasks[task_id]['depends'] if isinstance(t, AppFuture) or isinstance(t, DataFuture)])
+        task_log_info['task_depends'] = ",".join([str(t.tid) for t in task_record['depends'] if isinstance(t, AppFuture) or isinstance(t, DataFuture)])
         return task_log_info
 
     def _count_deps(self, depends: Sequence[Future]) -> int:
@@ -281,8 +277,10 @@ class DataFlowKernel(object):
              makes this callback
         """
 
-        if not isinstance(task_id, int):
-            raise ValueError("BENC manual type check 1")
+        task_record = self.tasks[task_id]
+
+        if not future.done():
+            raise ValueError("done callback called, despite future not reporting itself as done")
 
         try:
             res = future.result()
@@ -293,64 +291,52 @@ class DataFlowKernel(object):
             logger.debug("Task {} failed".format(task_id))
             # We keep the history separately, since the future itself could be
             # tossed.
-            self.tasks[task_id]['fail_history'].append(str(e))
-            self.tasks[task_id]['fail_count'] += 1
+            task_record['fail_history'].append(str(e))
+            task_record['fail_count'] += 1
 
-            if self.tasks[task_id]['status'] == States.dep_fail:
+            if task_record['status'] == States.dep_fail:
                 logger.info("Task {} failed due to dependency failure so skipping retries".format(task_id))
-            elif self.tasks[task_id]['fail_count'] <= self._config.retries:
-                self.tasks[task_id]['status'] = States.pending
+                task_record['time_returned'] = datetime.datetime.now()
+                with task_record['app_fu']._update_lock:
+                    task_record['app_fu'].set_exception(e)
+
+            elif task_record['fail_count'] <= self._config.retries:
+                task_record['status'] = States.pending
                 logger.info("Task {} marked for retry".format(task_id))
 
             else:
                 logger.exception("Task {} failed after {} retry attempts".format(task_id,
                                                                                  self._config.retries))
-                self.tasks[task_id]['status'] = States.failed
+                task_record['status'] = States.failed
                 self.tasks_failed_count += 1
-                self.tasks[task_id]['time_returned'] = datetime.datetime.now()
+                task_record['time_returned'] = datetime.datetime.now()
+                with task_record['app_fu']._update_lock:
+                    task_record['app_fu'].set_exception(e)
 
         else:
-            self.tasks[task_id]['status'] = States.done
+
+            task_record['status'] = States.done
             self.tasks_completed_count += 1
 
             logger.info("Task {} completed".format(task_id))
-            self.tasks[task_id]['time_returned'] = datetime.datetime.now()
+            task_record['time_returned'] = datetime.datetime.now()
 
-        if self.tasks[task_id]['app_fu'].stdout is not None:
-            logger.info("Standard output for task {} available at {}".format(task_id, self.tasks[task_id]['app_fu'].stdout))
-        if self.tasks[task_id]['app_fu'].stderr is not None:
-            logger.info("Standard error for task {} available at {}".format(task_id, self.tasks[task_id]['app_fu'].stderr))
+            with task_record['app_fu']._update_lock:
+                task_record['app_fu'].set_result(future.result())
+
+        if task_record['app_fu'].stdout is not None:
+            logger.info("Standard output for task {} available at {}".format(task_id, task_record['app_fu'].stdout))
+        if task_record['app_fu'].stderr is not None:
+            logger.info("Standard error for task {} available at {}".format(task_id, task_record['app_fu'].stderr))
 
         if self.monitoring:
-            task_log_info = self._create_task_log_info(task_id)
+            task_log_info = self._create_task_log_info(task_record)
             self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
         # it might be that in the course of the update, we've gone back to being
         # pending - in which case, we should consider ourself for relaunch
-        if self.tasks[task_id]['status'] == States.pending:
+        if task_record['status'] == States.pending:
             self.launch_if_ready(task_id)
-
-        with self.tasks[task_id]['app_fu']._update_lock:
-
-            if not future.done():
-                raise ValueError("done callback called, despite future not reporting itself as done")
-
-            try:
-                res = future.result()
-                if isinstance(res, RemoteExceptionWrapper):
-                    res.reraise()
-
-                self.tasks[task_id]['app_fu'].set_result(future.result())
-            except Exception as e:
-                if self.tasks[task_id]['retries_left'] > 0:
-                    # ignore this exception, because assume some later
-                    # parent executor, started external to this class,
-                    # will provide the answer
-                    pass
-                else:
-                    self.tasks[task_id]['app_fu'].set_exception(e)
-
-        return
 
     def handle_app_update(self, task_id: int, future: AppFuture) -> None:
         """This function is called as a callback when an AppFuture
@@ -450,7 +436,7 @@ class DataFlowKernel(object):
                 self.tasks_dep_fail_count += 1
 
                 if self.monitoring is not None:
-                    task_log_info = self._create_task_log_info(task_id)
+                    task_log_info = self._create_task_log_info(task_record)
                     self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
                 self.tasks[task_id]['retries_left'] = 0
@@ -519,7 +505,7 @@ class DataFlowKernel(object):
             exec_fu = executor.submit(executable, self.tasks[task_id]['resource_specification'], *args, **kwargs)
         self.tasks[task_id]['status'] = States.launched
         if self.monitoring is not None:
-            task_log_info = self._create_task_log_info(task_id)
+            task_log_info = self._create_task_log_info(self.tasks[task_id])
             self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
         self.tasks[task_id]['retries_left'] = self._config.retries - \
@@ -595,23 +581,23 @@ class DataFlowKernel(object):
         return func
 
     def _gather_all_deps(self, args: Sequence[Any], kwargs: Dict[str, Any]) -> List[Future]:
-        """Count the number of unresolved futures on which a task depends.
+        """Assemble a list of all Futures passed as arguments, kwargs or in the inputs kwarg.
 
         Args:
-            - args: The list of args list to the fn
-            - kwargs: The dict of all kwargs passed to the fn
+            - args: The list of args pass to the app
+            - kwargs: The dict of all kwargs passed to the app
 
         Returns:
             - list of dependencies
 
         """
-        # Check the positional args
-        depends = []
+        depends: List[Future] = []
 
         def check_dep(d: Any) -> None:
             if isinstance(d, Future):
                 depends.extend([d])
 
+        # Check the positional args
         for dep in args:
             check_dep(dep)
 
@@ -820,7 +806,7 @@ class DataFlowKernel(object):
         logger.debug("Task {} set to pending state with AppFuture: {}".format(task_id, task_def['app_fu']))
 
         if self.monitoring is not None:
-            task_log_info = self._create_task_log_info(task_id)
+            task_log_info = self._create_task_log_info(self.tasks[task_id])
             self.monitoring.send(MessageType.TASK_INFO, task_log_info)
 
         # at this point add callbacks to all dependencies to do a launch_if_ready
@@ -1000,7 +986,6 @@ class DataFlowKernel(object):
                                   'tasks_completed_count': self.tasks_completed_count,
                                   "time_began": self.time_began,
                                   'time_completed': self.time_completed,
-                                  'workflow_duration': (self.time_completed - self.time_began).total_seconds(),
                                   'run_id': self.run_id, 'rundir': self.run_dir})
 
             self.monitoring.close()
