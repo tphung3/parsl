@@ -124,22 +124,32 @@ class LocalProvider(ExecutionProvider, RepresentationMixin, Channeled):
 
         return [self.resources[jid]['status'] for jid in job_ids]
 
-    def _is_alive(self, job_dict):
+    def _is_alive(self, job_dict) -> bool:
         retcode, stdout, stderr = self.channel.execute_wait(
             'ps -p {} > /dev/null 2> /dev/null; echo "STATUS:$?" '.format(
                 job_dict['remote_pid']), self.cmd_timeout)
-        for line in stdout.split('\n'):
-            if line.startswith("STATUS:"):
-                status = line.split("STATUS:")[1].strip()
-                if status == "0":
-                    return True
-                else:
-                    return False
+        if stdout:
+            for line in stdout.split('\n'):
+                if line.startswith("STATUS:"):
+                    status = line.split("STATUS:")[1].strip()
+                    if status == "0":
+                        return True
+                    else:
+                        return False
+            raise RuntimeError("Hit end of stdout scan without finding STATUS. Unclear what the correct default behaviour is here, so raising exception")
+        else:
+            raise RuntimeError("no stdout. Unclear what the correct default behaviour is here, so raising exception.")
 
     def _job_file_path(self, script_path: str, suffix: str) -> str:
         path = '{0}{1}'.format(script_path, suffix)
         if self._should_move_files():
-            path = self.channel.pull_file(path, self.script_dir)
+            if not self.script_dir:
+                raise RuntimeError("want to pull_file but script_dir is not defined - unclear what the correct behaviour is so raising exception")
+            new_path = self.channel.pull_file(path, self.script_dir)
+            if path is None:
+                raise RuntimeError("pull_file returned None - unclear what the correct behaviour is so raising exception")
+            else:
+                path = new_path
         return path
 
     def _read_job_file(self, script_path: str, suffix: str) -> str:
@@ -249,7 +259,7 @@ class LocalProvider(ExecutionProvider, RepresentationMixin, Channeled):
                     remote_pid = line.split("PID:")[1].strip()
                     job_id = remote_pid
         else:
-            logger.debug("benc-mypy branch: no stdout from launch command... this would have resulted in a runtime type error trying to split stdout. Instead, acting as if stdout has no lines.")
+            logger.debug("no stdout, which would caused a runtime type error splitting stdout. Acting as if stdout has no lines.")
         if job_id is None:
             raise SubmitException(job_name, "Channel failed to start remote command/retrieve PID")
 

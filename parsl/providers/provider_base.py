@@ -1,9 +1,12 @@
 import os
 from abc import ABCMeta, abstractmethod, abstractproperty
 from enum import Enum
+import logging
 from typing import Any, Dict, List, Optional
 
 from parsl.channels.base import Channel
+
+logger = logging.getLogger(__name__)
 
 
 # mypy can't typecheck the master version of JobState
@@ -42,7 +45,7 @@ class JobStatus(object):
     # previously = None implied Optional on the type, but there has been some pressure
     # against that - see https://github.com/python/typing/issues/275
     def __init__(self, state: JobState, message: Optional[str] = None, exit_code: Optional[int] = None,
-                 stdout_path: str = None, stderr_path: str = None):
+                 stdout_path: Optional[str] = None, stderr_path: Optional[str] = None):
         self.state = state
         self.message = message
         self.exit_code = exit_code
@@ -60,37 +63,56 @@ class JobStatus(object):
             return "{}".format(self.state)
 
     @property
-    def stdout(self):
-        return self._read_file(self.stdout_path)
+    def stdout(self) -> Optional[str]:
+        if self.stdout_path:
+            return self._read_file(self.stdout_path)
+        else:
+            return None
 
     @property
-    def stderr(self):
-        return self._read_file(self.stderr_path)
+    def stderr(self) -> Optional[str]:
+        if self.stderr_path:
+            return self._read_file(self.stderr_path)
+        else:
+            return None
 
-    def _read_file(self, path):
+    def _read_file(self, path: str) -> Optional[str]:
         try:
             with open(path, 'r') as f:
                 return f.read()
         except Exception:
+            logger.exception("Converting exception to None")
             return None
 
     @property
-    def stdout_summary(self):
-        return self._read_summary(self.stdout_path)
+    def stdout_summary(self) -> Optional[str]:
+        if self.stdout_path:
+            return self._read_summary(self.stdout_path)
+        else:
+            return None
 
     @property
-    def stderr_summary(self):
-        return self._read_summary(self.stderr_path)
+    def stderr_summary(self) -> Optional[str]:
+        if self.stderr_path:
+            return self._read_summary(self.stderr_path)
+        else:
+            return None
 
-    def _read_summary(self, path):
+    def _read_summary(self, path: str) -> str:
         with open(path, 'r') as f:
             f.seek(0, os.SEEK_END)
             size = f.tell()
             f.seek(0, os.SEEK_SET)
             if size > JobStatus.SUMMARY_TRUNCATION_THRESHOLD:
-                head = f.read(JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2)
-                f.seek(size - JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2, os.SEEK_SET)
-                tail = f.read(JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2)
+                # there is a round down here if SUMMARY_TRUNCATION_THRESHOLD
+                # is not an even number.
+                # That's probably better than the non-typechecked behaviour
+                # which was for f.read to fail with being given a float not an int
+                half_threshold = int(JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2)
+
+                head = f.read(half_threshold)
+                f.seek(size - half_threshold, os.SEEK_SET)
+                tail = f.read(half_threshold)
                 return head + '\n...\n' + tail
             else:
                 f.seek(0, os.SEEK_SET)
