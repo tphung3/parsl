@@ -8,7 +8,6 @@ from abc import ABCMeta, abstractmethod
 from inspect import getsource
 from hashlib import md5
 from inspect import signature
-import typeguard
 
 from typing import TYPE_CHECKING
 from typing import Optional
@@ -35,7 +34,11 @@ class AppBase(metaclass=ABCMeta):
     """
 
     @typeguard.typechecked
-    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, executors: Union[List[str], Literal['all']] = 'all', cache: bool = False, ignore_for_cache=None) -> None:
+    def __init__(self, func,
+                 data_flow_kernel: Optional[DataFlowKernel] = None,
+                 executors: Union[List[str], Literal['all']] = 'all',
+                 cache: bool = False,
+                 ignore_for_cache=None) -> None:
         """Construct the App object.
 
         Args:
