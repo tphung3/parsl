@@ -8,6 +8,7 @@ from abc import ABCMeta, abstractmethod
 from inspect import getsource
 from hashlib import md5
 from inspect import signature
+import typeguard
 
 from typing import TYPE_CHECKING
 from typing import Optional
@@ -33,7 +34,8 @@ class AppBase(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, executors='all', cache: bool = False, ignore_for_cache=None) -> None:
+    @typeguard.typechecked
+    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None, executors: Union[List[str], Literal['all']] = 'all', cache: bool = False, ignore_for_cache=None) -> None:
         """Construct the App object.
 
         Args:
@@ -57,9 +59,11 @@ class AppBase(metaclass=ABCMeta):
         self.executors = executors
         self.cache = cache
         self.ignore_for_cache = ignore_for_cache
-        if not (isinstance(executors, list) or isinstance(executors, str)):
-            logger.error("App {} specifies invalid executor option, expects string or list".format(
-                func.__name__))
+
+        # unreachable if properly typechecked
+        # if not (isinstance(executors, list) or isinstance(executors, str)):
+        #    logger.error("App {} specifies invalid executor option, expects string or list".format(
+        #        func.__name__))
 
         if cache is True:
             try:
