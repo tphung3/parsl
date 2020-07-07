@@ -54,6 +54,7 @@ def task_gantt_plot(df_task, df_status, time_completed=None):
               'pending': 'rgb(168, 168, 168)',
               'launched': 'rgb(100, 255, 255)',
               'running': 'rgb(0, 0, 255)',
+              'joining': 'rgb(128, 128, 255)',
               'dep_fail': 'rgb(255, 128, 255)',
               'failed': 'rgb(200, 0, 0)',
               'exec_done': 'rgb(0, 200, 0)',
@@ -232,10 +233,11 @@ def workflow_dag_plot(df_tasks, group_by_apps=True):
                        "pending": (1, 'rgb(168, 168, 168)'),
                        "launched": (2, 'rgb(100, 255, 255)'),
                        "running": (3, 'rgb(0, 0, 255)'),
-                       "dep_fail": (4, 'rgb(255, 128, 255)'),
-                       "failed": (5, 'rgb(200, 0, 0)'),
-                       "exec_done": (6, 'rgb(0, 200, 0)'),
-                       "memo_done": (7, 'rgb(64, 200, 64)')
+                       "joining": (5, 'rgb(128, 128, 255)'),
+                       "dep_fail": (6, 'rgb(255, 128, 255)'),
+                       "failed": (7, 'rgb(200, 0, 0)'),
+                       "exec_done": (8, 'rgb(0, 200, 0)'),
+                       "memo_done": (9, 'rgb(64, 200, 64)')
                       }
 
     node_traces = [...] * len(groups_list)
