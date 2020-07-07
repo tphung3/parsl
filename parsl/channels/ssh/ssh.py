@@ -38,7 +38,8 @@ class SSHChannel(Channel, RepresentationMixin):
                  gssapi_auth: bool = False,
                  skip_auth: bool = False,
                  port: int = 22,
-                 key_filename: Optional[str] = None):
+                 key_filename: Optional[str] = None,
+                 host_keys_filename: Optional[str] = None):
         ''' Initialize a persistent connection to the remote system.
         We should know at this point whether ssh connectivity is possible
 
@@ -75,12 +76,13 @@ class SSHChannel(Channel, RepresentationMixin):
         self.skip_auth = skip_auth
         self.gssapi_auth = gssapi_auth
         self.key_filename = key_filename
+        self.host_keys_filename = host_keys_filename
 
         if self.skip_auth:
             self.ssh_client = NoAuthSSHClient()
         else:
             self.ssh_client = paramiko.SSHClient()
-        self.ssh_client.load_system_host_keys()
+        self.ssh_client.load_system_host_keys(filename=host_keys_filename)
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         self.envs = {}  # type: Dict[str, str]
