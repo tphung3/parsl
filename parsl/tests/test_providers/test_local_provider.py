@@ -55,6 +55,7 @@ def _run_tests(p: LocalProvider):
     assert status.stderr == 'magic'
 
 
+@pytest.mark.local
 def test_local_channel():
     with tempfile.TemporaryDirectory() as script_dir:
         script_dir = tempfile.mkdtemp()
