@@ -17,7 +17,7 @@ from concurrent.futures import Future
 from functools import partial
 
 # mostly for type checking
-from typing import Any, Callable, Dict, Iterable, Optional, Union, List, Sequence, Tuple
+from typing import cast, Any, Callable, Dict, Iterable, Optional, Union, List, Sequence, Tuple
 from parsl.channels.base import Channel
 from parsl.executors.base import ParslExecutor
 from parsl.providers.provider_base import Channeled, MultiChanneled, ExecutionProvider
@@ -608,7 +608,7 @@ class DataFlowKernel(object):
 
         return depends
 
-    def sanitize_and_wrap(self, task_id: int, args: Sequence[Any], kwargs: Dict[str, Any]) -> Tuple[List[Any], Dict[str, Any], List[Exception]]:
+    def sanitize_and_wrap(self, task_id: int, args: Sequence[Any], kwargs: Dict[str, Any]) -> Tuple[List[Any], Dict[str, Any], List[Tuple[Exception, str]]]:
         """This function should be called only when all the futures we track have been resolved.
 
         If the user hid futures a level below, we will not catch
@@ -637,7 +637,13 @@ class DataFlowKernel(object):
                 try:
                     new_args.extend([dep.result()])
                 except Exception as e:
-                    dep_failures.extend([e])
+                    if hasattr(dep, 'task_def'):
+                        # this cast is because hasattr facts don't propagate into if statements - replace with a protocol?
+                        d_tmp = cast(Any, dep)
+                        tid = d_tmp.task_def['id']
+                    else:
+                        tid = None
+                    dep_failures.extend([(e, tid)])
             else:
                 new_args.extend([dep])
 
@@ -648,7 +654,12 @@ class DataFlowKernel(object):
                 try:
                     kwargs[key] = dep.result()
                 except Exception as e:
-                    dep_failures.extend([e])
+                    if hasattr(dep, 'task_def'):
+                        d_tmp = cast(Any, dep)
+                        tid = d_tmp.task_def['id']
+                    else:
+                        tid = None
+                    dep_failures.extend([(e, tid)])
 
         # Check for futures in inputs=[<fut>...]
         if 'inputs' in kwargs:
@@ -658,7 +669,12 @@ class DataFlowKernel(object):
                     try:
                         new_inputs.extend([dep.result()])
                     except Exception as e:
-                        dep_failures.extend([e])
+                        if hasattr(dep, 'task_def'):
+                            d_tmp = cast(Any, dep)
+                            tid = d_tmp.task_def['id']
+                        else:
+                            tid = None
+                        dep_failures.extend([(e, tid)])
 
                 else:
                     new_inputs.extend([dep])

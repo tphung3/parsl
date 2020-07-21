@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 
 class DataFlowException(Exception):
@@ -53,13 +53,13 @@ class DependencyError(DataFlowException):
     dependent_exceptions
     """
 
-    def __init__(self, dependent_exceptions: List[Exception], task_id: int) -> None:
-        self.dependent_exceptions = dependent_exceptions
+    def __init__(self, dependent_exceptions_tids: List[Tuple[Exception, str]], task_id: int) -> None:
+        self.dependent_exceptions_tids = dependent_exceptions_tids
         self.task_id = task_id
 
     def __repr__(self) -> str:
-        return "Dependency failure for task {} from: {}".format(self.task_id,
-                                                                self.dependent_exceptions)
+        dep_tids = [tid for (exception, tid) in self.dependent_exceptions_tids]
+        return "Dependency failure for task {} with failed dependencies from tasks {}".format(self.task_id, dep_tids)
 
     def __str__(self) -> str:
         return self.__repr__()
