@@ -32,7 +32,7 @@ from parsl.executors.errors import ScalingFailed
 from parsl.executors.workqueue import exec_parsl_function
 
 import typeguard
-from typing import Dict, List, Optional, Set
+from typing import Dict, Optional, Sequence, Set
 from parsl.data_provider.staging import Staging
 
 from .errors import WorkQueueTaskFailure
@@ -183,7 +183,7 @@ class WorkQueueExecutor(NoStatusHandlingExecutor):
                  port: int = WORK_QUEUE_DEFAULT_PORT,
                  env: Optional[Dict] = None,
                  shared_fs: bool = False,
-                 storage_access: Optional[List[Staging]] = None,
+                 storage_access: Optional[Sequence[Staging]] = None,
                  use_cache: bool = False,
                  source: bool = False,
                  pack: bool = False,

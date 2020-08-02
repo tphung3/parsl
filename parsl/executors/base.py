@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from concurrent.futures import Future
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Sequence
+
+from parsl.data_provider.staging import Staging
 
 # for type checking:
 from parsl.providers.provider_base import ExecutionProvider
@@ -22,17 +24,11 @@ class ParslExecutor(metaclass=ABCMeta):
 
     An executor may optionally expose:
 
-       storage_access: List[parsl.data_provider.staging.Staging] - a list of staging
+       storage_access: Sequence[parsl.data_provider.staging.Staging] - a sequence of staging
               providers that will be used for file staging. In the absence of this
               attribute, or if this attribute is `None`, then a default value of
               `parsl.data_provider.staging.default_staging` will be used by the
               staging code.
-
-              Typechecker note: Ideally storage_access would be declared on executor
-              __init__ methods as List[Staging] - however, lists are by default
-              invariant, not co-variant, and it looks like @typeguard cannot be
-              persuaded otherwise. So if you're implementing an executor and want to
-              @typeguard the constructor, you'll have to use List[Any] here.
     """
 
     # mypy doesn't actually check that the below are defined by
@@ -44,7 +40,7 @@ class ParslExecutor(metaclass=ABCMeta):
     managed: bool
     outstanding: Any  # what is this? used by strategy
     working_dir: Optional[str]
-    storage_access: Optional[List[Any]]
+    storage_access: Optional[Sequence[Staging]]
 
     @abstractmethod
     def start(self) -> None:
