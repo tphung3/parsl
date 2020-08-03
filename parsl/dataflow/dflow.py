@@ -384,7 +384,7 @@ class DataFlowKernel(object):
 
     @staticmethod
     def check_staging_inhibited(kwargs):
-        return kwargs.get('staging_inhibit_output', False)
+        return kwargs.get('_parsl_staging_inhibit', False)
 
     def launch_if_ready(self, task_id):
         """
@@ -532,7 +532,8 @@ class DataFlowKernel(object):
 
         # Return if the task is a data management task, rather than doing
         # data managament on it.
-        if executor == 'data_manager':
+        if self.check_staging_inhibited(kwargs):
+            logger.debug("Not performing input staging")
             return args, kwargs, func
 
         inputs = kwargs.get('inputs', [])
@@ -579,7 +580,7 @@ class DataFlowKernel(object):
                 if newfunc:
                     func = newfunc
             else:
-                logger.debug("Not performing staging for: {}".format(repr(f)))
+                logger.debug("Not performing output staging for: {}".format(repr(f)))
                 app_fut._outputs.append(DataFuture(app_fut, f, tid=app_fut.tid))
         return func
 
