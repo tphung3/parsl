@@ -2,7 +2,7 @@ from parsl.serialize.concretes import *  # noqa: F403,F401
 from parsl.serialize.base import METHODS_MAP_DATA, METHODS_MAP_CODE, SerializerBase
 import logging
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ class ParslSerializer(object):
     """
     __singleton_instance = None
 
-    def __new__(cls) -> ParslSerializer:
+    def __new__(cls) -> "ParslSerializer":  # quotes on type here because we haven't finished definining ParslSerializer yet, I think
         """ Make ParslSerializer a singleton using the fact that there's only one instance
         of a class variable
         """

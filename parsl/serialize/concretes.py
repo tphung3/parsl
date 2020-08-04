@@ -7,6 +7,7 @@ from parsl.serialize.base import SerializerBase
 
 from typing import Any
 
+
 class PickleSerializer(SerializerBase):
     """ Pickle serialization covers most python objects, with some notable exceptions:
 
