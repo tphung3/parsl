@@ -520,7 +520,7 @@ def worker(worker_id, pool_id, pool_size, task_queue, result_queue, worker_queue
 
         try:
             result = execute_task(req['buffer'])
-            serialized_result = serialize(result, buffer_threshold=1e6)
+            serialized_result = serialize(result, buffer_threshold=int(1e6))
         except Exception as e:
             logger.info('Caught an exception: {}'.format(e))
             result_package = {'task_id': tid, 'exception': serialize(RemoteExceptionWrapper(*sys.exc_info()))}
