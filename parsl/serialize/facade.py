@@ -2,7 +2,7 @@ from parsl.serialize.concretes import *  # noqa: F403,F401
 from parsl.serialize.base import METHODS_MAP_DATA, METHODS_MAP_CODE, SerializerBase
 import logging
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 logger = logging.getLogger(__name__)
 
@@ -75,40 +75,36 @@ class ParslSerializer(object):
         Individual serialization methods might raise a TypeError (eg. if objects are non serializable)
         This method will raise the exception from the last method that was tried, if all methods fail.
         """
-        serialized = None  # type: Optional[bytes]
-        last_exception = None  # type: Optional[Exception]
+        result: Union[bytes, Exception]
         if callable(obj):
             for method in self.methods_for_code.values():
                 try:
-                    serialized = method.serialize(obj)
+                    result = method.serialize(obj)
                     # We attempt a deserialization to make sure both work.
-                    method.deserialize(serialized)
+                    method.deserialize(result)
                 except Exception as e:
                     logger.exception(f"Serialization method: {method} did not work")
-                    last_exception = e
+                    result = e
                     continue
                 else:
                     break
         else:
             for method in self.methods_for_data.values():
                 try:
-                    serialized = method.serialize(obj)
+                    result = method.serialize(obj)
                 except Exception as e:
                     logger.exception(f"Serialization method {method} did not work")
-                    last_exception = e
+                    result = e
                     continue
                 else:
                     break
 
-        if last_exception:
-            # TODO : Replace with a SerializationError
-            raise last_exception
-        elif serialized is not None:
-            if len(serialized) > buffer_threshold:
-                raise TypeError(f"Serialized object is too large and exceeds buffer threshold of {buffer_threshold} bytes")
-            return serialized
+        if isinstance(result, BaseException):
+            raise result
         else:
-            raise RuntimeError("Internal consistency error: neither a serialized object or an error was produced by serialization")
+            if len(result) > buffer_threshold:
+                raise TypeError(f"Serialized object is too large and exceeds buffer threshold of {buffer_threshold} bytes")
+            return result
 
     def deserialize(self, payload: bytes) -> Any:
         """
