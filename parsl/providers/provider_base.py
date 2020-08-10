@@ -98,7 +98,7 @@ class JobStatus(object):
         else:
             return None
 
-    def _read_summary(self, path: str) -> str:
+    def _read_summary(self, path: str) -> Optional[str]:
         if not path:
             # can happen for synthetic job failures
             return None

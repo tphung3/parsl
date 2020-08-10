@@ -1,7 +1,7 @@
 import logging
 import parsl  # noqa F401 (used in string type annotation)
 import time
-from typing import Dict, Sequence, Optional
+from typing import cast, Dict, Sequence, Optional
 from typing import List  # noqa F401 (used in type annotation)
 
 from parsl.dataflow.executor_status import ExecutorStatus
@@ -60,9 +60,15 @@ class TaskStatusPoller(object):
         self._strategy = Strategy(dfk)
         self._error_handler = JobErrorHandler()
 
-    def poll(self, tasks: Optional[List[str]] = None, kind: Optional[str] = None) -> None:
+    def poll(self, tasks: Optional[Sequence[str]] = None, kind: Optional[str] = None) -> None:
         self._update_state()
-        self._error_handler.run(self._poll_items)
+
+        # List is invariant, and the type of _poll_items if List[PollItem]
+        # but run wants a list of ExecutorStatus.
+        # This cast should be safe *if* .run does not break the reason that
+        # List is invariant, which is that it does not add anything into the
+        # the list (otherwise, List[PollItem] might end up with ExecutorStatus not-PollItems in it.
+        self._error_handler.run(cast(List[ExecutorStatus], self._poll_items))
         self._strategy.strategize(self._poll_items, tasks)
 
     def _update_state(self) -> None:

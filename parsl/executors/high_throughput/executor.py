@@ -578,7 +578,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
              NotImplementedError
         """
         if not self.provider:
-            raise (ScalingFailed("No execution provider available"))
+            raise ScalingFailed("none", "No execution provider available")
         r = []  # type: List[object]
         for i in range(blocks):
             external_block_id = str(len(self.blocks))

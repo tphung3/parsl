@@ -19,7 +19,7 @@ class StatusHandlingExecutor(ParslExecutor):
         # errors can happen during the sumbit call to the provider; this is used
         # to keep track of such errors so that they can be handled in one place
         # together with errors reported by status()
-        self._simulated_status = {}
+        self._simulated_status = {}  # type: Dict[object, JobStatus]
         self._executor_bad_state = threading.Event()
         self._executor_exception = None  # type: Optional[Exception]
         self._generated_job_id_counter = 1
