@@ -99,24 +99,31 @@ class JobStatus(object):
             return None
 
     def _read_summary(self, path: str) -> str:
-        with open(path, 'r') as f:
-            f.seek(0, os.SEEK_END)
-            size = f.tell()
-            f.seek(0, os.SEEK_SET)
-            if size > JobStatus.SUMMARY_TRUNCATION_THRESHOLD:
-                # there is a round down here if SUMMARY_TRUNCATION_THRESHOLD
-                # is not an even number.
-                # That's probably better than the non-typechecked behaviour
-                # which was for f.read to fail with being given a float not an int
-                half_threshold = int(JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2)
-
-                head = f.read(half_threshold)
-                f.seek(size - half_threshold, os.SEEK_SET)
-                tail = f.read(half_threshold)
-                return head + '\n...\n' + tail
-            else:
+        if not path:
+            # can happen for synthetic job failures
+            return None
+        try:
+            with open(path, 'r') as f:
+                f.seek(0, os.SEEK_END)
+                size = f.tell()
                 f.seek(0, os.SEEK_SET)
-                return f.read()
+                if size > JobStatus.SUMMARY_TRUNCATION_THRESHOLD:
+                    # there is a round down here if SUMMARY_TRUNCATION_THRESHOLD
+                    # is not an even number.
+                    # That's probably better than the non-typechecked behaviour
+                    # which was for f.read to fail with being given a float not an int
+                    half_threshold = int(JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2)
+                    head = f.read(half_threshold)
+                    f.seek(size - half_threshold, os.SEEK_SET)
+                    tail = f.read(half_threshold)
+                    return head + '\n...\n' + tail
+                else:
+                    f.seek(0, os.SEEK_SET)
+                    return f.read()
+        except FileNotFoundError:
+            # When output is redirected to a file, but the process does not produce any output
+            # bytes, no file is actually created. This handles that case.
+            return None
 
 
 class ExecutionProvider(metaclass=ABCMeta):

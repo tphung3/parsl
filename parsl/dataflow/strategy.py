@@ -28,8 +28,8 @@ from typing import Sequence
 
 
 from parsl.dataflow.executor_status import ExecutorStatus
-from parsl.executors import HighThroughputExecutor, ExtremeScaleExecutor
 
+from parsl.executors import HighThroughputExecutor, ExtremeScaleExecutor
 from parsl.providers.provider_base import JobState
 
 logger = logging.getLogger(__name__)
