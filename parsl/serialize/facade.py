@@ -83,7 +83,6 @@ class ParslSerializer(object):
                     # We attempt a deserialization to make sure both work.
                     method.deserialize(result)
                 except Exception as e:
-                    logger.exception(f"Serialization method: {method} did not work")
                     result = e
                     continue
                 else:
@@ -93,7 +92,6 @@ class ParslSerializer(object):
                 try:
                     result = method.serialize(obj)
                 except Exception as e:
-                    logger.exception(f"Serialization method {method} did not work")
                     result = e
                     continue
                 else:
