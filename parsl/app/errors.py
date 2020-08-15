@@ -158,6 +158,9 @@ class RemoteExceptionWrapper:
 # I am extremely suspicious of this TypeVar declaration - especially because
 # I've put a cast in.
 
+# see https://github.com/dry-python/returns/blob/92eda5574a8e41f4f5af4dd29887337886301ee3/returns/contrib/mypy/decorator_plugin.py
+# for a mypy plugin to do this in a hacky way
+
 G = TypeVar("G")
 F = TypeVar("F", bound=Callable[..., Union[G, RemoteExceptionWrapper]])
 
@@ -172,3 +175,13 @@ def wrap_error(func: F) -> F:
             return RemoteExceptionWrapper(*sys.exc_info())
 
     return cast(F, wrapper)
+
+
+@wrap_error
+def f(x: int) -> Union[str, RemoteExceptionWrapper]:
+  return "foof"
+
+
+def g(x: int) -> Union[str, RemoteExceptionWrapper]:
+  return f(x)
+
