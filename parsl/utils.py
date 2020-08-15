@@ -104,11 +104,8 @@ def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
     return [last_checkpoint]
 
 
-# vs PR 1846
-# def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
-
 @typeguard.typechecked
-def get_std_fname_mode(fdname: str, stdfspec: Union[None, str, Tuple[str, str]]):
+def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]):
     import parsl.app.errors as pe
     if stdfspec is None:
         return None, None
