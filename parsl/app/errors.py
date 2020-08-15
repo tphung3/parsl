@@ -6,7 +6,7 @@ from types import TracebackType
 import dill
 import logging
 from tblib import Traceback
-from typing import cast, List, TypeVar
+from typing import cast, List, TypeVar, Type
 
 from six import reraise
 
@@ -155,12 +155,13 @@ class RemoteExceptionWrapper:
 # no reason it *should* believe that in general) so there is a cast at the
 # end of the function now to make that type assertion.
 
-# BUT! that type assertion is wrong: because in addition to returning a value
-# of the original type, we can now also return a value of type RemoteExceptionWrapper
+# I am extremely suspicious of this TypeVar declaration - especially because
+# I've put a cast in.
 
-ErrorWrappedFunc = TypeVar("ErrorWrappedFunc", bound=Callable)
+G = TypeVar("G")
+F = TypeVar("F", bound=Callable[..., Union[G, RemoteExceptionWrapper]])
 
-def wrap_error(func: ErrorWrappedFunc) -> ErrorWrappedFunc:
+def wrap_error(func: F) -> F:
     @wraps(func)
     def wrapper(*args: object, **kwargs: object) -> Any:
         import sys
@@ -170,6 +171,4 @@ def wrap_error(func: ErrorWrappedFunc) -> ErrorWrappedFunc:
         except Exception:
             return RemoteExceptionWrapper(*sys.exc_info())
 
-    # this cast is wrong - the function might now also return a RemoteExceptionWrapper
-    return cast(ErrorWrappedFunc, wrapper)
-
+    return cast(F, wrapper)
