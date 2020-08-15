@@ -6,7 +6,7 @@ from types import TracebackType
 import dill
 import logging
 from tblib import Traceback
-from typing import List
+from typing import cast, List, TypeVar
 
 from six import reraise
 
@@ -16,6 +16,8 @@ from parsl.data_provider.files import File
 # more directly, potentially to avoid import loops from trying to
 # import the top level "parsl" here.
 # from parsl import File
+
+# vs PR 1846: see TypeVar playing in response to PR 1846 TODO
 
 logger = logging.getLogger(__name__)
 
@@ -143,10 +145,22 @@ class RemoteExceptionWrapper:
         reraise(t, v, tb)
 
 
-# TODO: [typing] I don't think this is correct. We need to constrain the type of the
-# wrapper to that of the wrapped function, whereas this specification makes the wrapper
-# untyped. That said, I found no evidence on the InterTubes that this is possible.
-def wrap_error(func: Callable[..., Any]) -> Callable[..., Any]:
+# vs PR 1846: PR 1846 makes wrap_error go from any callable to any callable
+# and typechecks without casts.
+
+# The benc-mypy version instead uses a type
+# variable which should make the wrapped function have the same type as the
+# supplied function - but the typechecker cannot see that from the implementation
+# because I think @wraps doesn't pass the right types through (and maybe there's
+# no reason it *should* believe that in general) so there is a cast at the
+# end of the function now to make that type assertion.
+
+# BUT! that type assertion is wrong: because in addition to returning a value
+# of the original type, we can now also return a value of type RemoteExceptionWrapper
+
+ErrorWrappedFunc = TypeVar("ErrorWrappedFunc", bound=Callable)
+
+def wrap_error(func: ErrorWrappedFunc) -> ErrorWrappedFunc:
     @wraps(func)
     def wrapper(*args: object, **kwargs: object) -> Any:
         import sys
@@ -155,4 +169,7 @@ def wrap_error(func: Callable[..., Any]) -> Callable[..., Any]:
             return func(*args, **kwargs)
         except Exception:
             return RemoteExceptionWrapper(*sys.exc_info())
-    return wrapper
+
+    # this cast is wrong - the function might now also return a RemoteExceptionWrapper
+    return cast(ErrorWrappedFunc, wrapper)
+
