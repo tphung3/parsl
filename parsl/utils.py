@@ -9,6 +9,7 @@ from contextlib import contextmanager
 
 from typing import Callable, List, Tuple, Union
 
+from typing import List, Tuple, Union, Generator, IO, AnyStr, Dict
 from typing_extensions import Protocol, runtime_checkable
 
 import parsl
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 @typeguard.typechecked
 def get_version() -> str:
-    version = parsl.__version__
+    version = parsl.__version__  # type: str
     work_tree = os.path.dirname(os.path.dirname(__file__))
     git_dir = os.path.join(work_tree, '.git')
     if os.path.exists(git_dir):
@@ -103,6 +104,9 @@ def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
     return [last_checkpoint]
 
 
+# vs PR 1846
+# def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
+
 @typeguard.typechecked
 def get_std_fname_mode(fdname: str, stdfspec: Union[None, str, Tuple[str, str]]):
     import parsl.app.errors as pe
@@ -121,7 +125,7 @@ def get_std_fname_mode(fdname: str, stdfspec: Union[None, str, Tuple[str, str]])
 
 
 @contextmanager
-def wait_for_file(path, seconds=10):
+def wait_for_file(path: str, seconds: int = 10) -> Generator[None, None, None]:
     for i in range(0, int(seconds * 100)):
         time.sleep(seconds / 100.)
         if os.path.exists(path):
@@ -130,7 +134,7 @@ def wait_for_file(path, seconds=10):
 
 
 @contextmanager
-def time_limited_open(path, mode, seconds=1):
+def time_limited_open(path: str, mode: str, seconds: int = 1) -> Generator[IO[AnyStr], None, None]:
     with wait_for_file(path, seconds):
         logger.debug("wait_for_file yielded")
     f = open(path, mode)
@@ -138,7 +142,7 @@ def time_limited_open(path, mode, seconds=1):
     f.close()
 
 
-def wtime_to_minutes(time_string):
+def wtime_to_minutes(time_string: str) -> int:
     ''' wtime_to_minutes
 
     Convert standard wallclock time string to minutes.
@@ -188,7 +192,10 @@ class RepresentationMixin(object):
     """
     __max_width__ = 80
 
-    def __repr__(self):
+
+    # vs PR 1846: this has a type: ignore where I have more invasively changed the code to
+    # use type(self).__init__ and not checked if that works
+    def __repr__(self) -> str:
         init = type(self).__init__  # does this change from self.__init__ work?
 
         # This test looks for a single layer of wrapping performed by
@@ -219,23 +226,23 @@ class RepresentationMixin(object):
             args = [getattr(self, a) for a in argspec.args[1:]]
         kwargs = {key: getattr(self, key) for key in defaults}
 
-        def assemble_multiline(args, kwargs):
-            def indent(text):
+        def assemble_multiline(args: List[str], kwargs: Dict[str, object]) -> str:
+            def indent(text: str) -> str:
                 lines = text.splitlines()
                 if len(lines) <= 1:
                     return text
                 return "\n".join("    " + line for line in lines).strip()
             args = ["\n    {},".format(indent(repr(a))) for a in args]
-            kwargs = ["\n    {}={}".format(k, indent(repr(v)))
-                      for k, v in sorted(kwargs.items())]
+            kwargsl = ["\n    {}={}".format(k, indent(repr(v)))
+                       for k, v in sorted(kwargs.items())]
 
-            info = "".join(args) + ", ".join(kwargs)
+            info = "".join(args) + ", ".join(kwargsl)
             return self.__class__.__name__ + "({}\n)".format(info)
 
-        def assemble_line(args, kwargs):
-            kwargs = ['{}={}'.format(k, repr(v)) for k, v in sorted(kwargs.items())]
+        def assemble_line(args: List[str], kwargs: Dict[str, object]) -> str:
+            kwargsl = ['{}={}'.format(k, repr(v)) for k, v in sorted(kwargs.items())]
 
-            info = ", ".join([repr(a) for a in args] + kwargs)
+            info = ", ".join([repr(a) for a in args] + kwargsl)
             return self.__class__.__name__ + "({})".format(info)
 
         if len(assemble_line(args, kwargs)) <= self.__class__.__max_width__:
