@@ -148,23 +148,13 @@ class RemoteExceptionWrapper:
 # vs PR 1846: PR 1846 makes wrap_error go from any callable to any callable
 # and typechecks without casts.
 
-# The benc-mypy version instead uses a type
-# variable which should make the wrapped function have the same type as the
-# supplied function - but the typechecker cannot see that from the implementation
-# because I think @wraps doesn't pass the right types through (and maybe there's
-# no reason it *should* believe that in general) so there is a cast at the
-# end of the function now to make that type assertion.
-
-# I am extremely suspicious of this TypeVar declaration - especially because
-# I've put a cast in.
-
 # see https://github.com/dry-python/returns/blob/92eda5574a8e41f4f5af4dd29887337886301ee3/returns/contrib/mypy/decorator_plugin.py
 # for a mypy plugin to do this in a hacky way
+# and this issue for more info on typing decorators:
 
-G = TypeVar("G")
-F = TypeVar("F", bound=Callable[..., Union[G, RemoteExceptionWrapper]])
+# https://github.com/python/mypy/issues/3157
 
-def wrap_error(func: F) -> F:
+def wrap_error(func):
     @wraps(func)
     def wrapper(*args: object, **kwargs: object) -> Any:
         import sys
@@ -174,14 +164,4 @@ def wrap_error(func: F) -> F:
         except Exception:
             return RemoteExceptionWrapper(*sys.exc_info())
 
-    return cast(F, wrapper)
-
-
-@wrap_error
-def f(x: int) -> Union[str, RemoteExceptionWrapper]:
-  return "foof"
-
-
-def g(x: int) -> Union[str, RemoteExceptionWrapper]:
-  return f(x)
-
+    return wrapper
