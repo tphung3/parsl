@@ -1,16 +1,16 @@
 """Exceptions raised by Apps."""
 from functools import wraps
-from typing import List, Union, Callable, Any
+from typing import List, Any
 from types import TracebackType
 
 import dill
 import logging
 from tblib import Traceback
-from typing import cast, List, TypeVar, Type
 
 from six import reraise
 
 from parsl.data_provider.files import File
+
 
 # vs PR 1846: benc-mypy imports File from the data_provider module
 # more directly, potentially to avoid import loops from trying to

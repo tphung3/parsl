@@ -7,9 +7,8 @@ import time
 import typeguard
 from contextlib import contextmanager
 
-from typing import Callable, List, Tuple, Union
+from typing import Callable, List, Tuple, Union, Generator, IO, AnyStr, Dict
 
-from typing import List, Tuple, Union, Generator, IO, AnyStr, Dict
 from typing_extensions import Protocol, runtime_checkable
 
 import parsl
@@ -188,7 +187,6 @@ class RepresentationMixin(object):
     Foo(1, 'two', third='three', fourth='baz')
     """
     __max_width__ = 80
-
 
     # vs PR 1846: this has a type: ignore where I have more invasively changed the code to
     # use type(self).__init__ and not checked if that works

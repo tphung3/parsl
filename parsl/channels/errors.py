@@ -11,6 +11,7 @@ from typing import Optional
 # channel error base and adding into only the subclasses which have
 # exceptions (can't remember what motivated this specifically)
 
+
 class ChannelError(Exception):
     """ Base class for all exceptions
 
