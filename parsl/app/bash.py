@@ -3,7 +3,7 @@ from functools import partial
 from inspect import signature, Parameter
 
 # for typing
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -14,7 +14,7 @@ from parsl.dataflow.dflow import DataFlowKernelLoader
 from parsl.dataflow.dflow import DataFlowKernel  # only for mypy
 
 
-def remote_side_bash_executor(func, *args, **kwargs) -> int:
+def remote_side_bash_executor(func: Callable[..., str], *args, **kwargs) -> int:
     """Executes the supplied function with *args and **kwargs to get a
     command-line to run, and then run that command-line using bash.
     """
@@ -121,7 +121,7 @@ def remote_side_bash_executor(func, *args, **kwargs) -> int:
 
 class BashApp(AppBase):
 
-    def __init__(self, func, data_flow_kernel: Optional[DataFlowKernel] = None,
+    def __init__(self, func: Callable[..., str], data_flow_kernel: Optional[DataFlowKernel] = None,
                  cache: bool = False,
                  executors: Union[List[str], Literal['all']] = 'all',
                  ignore_for_cache: Optional[List[str]] = None) -> None:
