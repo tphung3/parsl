@@ -217,10 +217,10 @@ class DataFlowKernel(object):
         task_log_info["task_fail_count"] = task_record['fail_count']
         task_log_info["task_status"] = task_record['status']
         task_log_info["task_id"] = task_record['id']
-        task_log_info["task_time_invoked"] = task_record['time_submitted']
-        task_log_info["task_try_time_launched"] = task_record['time_submitted']
+        task_log_info["task_time_invoked"] = task_record['time_invoked']
+        task_log_info["task_try_time_launched"] = task_record['try_time_launched']
         task_log_info["task_time_returned"] = task_record['time_returned']
-        task_log_info["task_task_time_returned"] = task_record['time_returned']
+        task_log_info["task_try_time_returned"] = task_record['try_time_returned']
         task_log_info["task_executor"] = task_record['executor']
         task_log_info['run_id'] = self.run_id
         task_log_info['try_id'] = task_record['try_id']

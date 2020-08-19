@@ -37,12 +37,15 @@ class TaskRecord(TypedDict, total=False):
     args: Sequence[Any]  # in some places we uses a Tuple[Any, ...] and in some places a List[Any]. This is an attempt to correctly type both of those.
     kwargs: Dict[str, Any]
 
-    time_submitted: Optional[datetime.datetime]
+    time_invoked: Optional[datetime.datetime]
     time_returned: Optional[datetime.datetime]
+    try_time_launched: Optional[datetime.datetime]
+    try_time_returned: Optional[datetime.datetime]
 
     memoize: bool
     ignore_for_cache: Sequence[str]
 
     id: int
+    try_id: int
 
     resource_specification: Dict[str, Any]
