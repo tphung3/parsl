@@ -39,7 +39,7 @@ class ParslSerializer(object):
     def _list_methods(self) -> Tuple[Dict[bytes, SerializerBase], Dict[bytes, SerializerBase]]:
         return self.methods_for_code, self.methods_for_data
 
-    def pack_apply_message(self, func: Any, args: Any, kwargs: Any, buffer_threshold: int = int(1e6)) -> bytes:
+    def pack_apply_message(self, func: Any, args: Any, kwargs: Any, buffer_threshold: int = int(128 * 1e6)) -> bytes:
         """Serialize and pack function and parameters
 
         Parameters
@@ -55,7 +55,8 @@ class ParslSerializer(object):
             Dict containing named parameters
 
         buffer_threshold: Ignored
-            Limits buffer to specified size in bytes. Default is 1e6 bytes.
+            Limits buffer to specified size in bytes. Exceeding this limit would give you
+            a warning in the log. Default is 128MB.
         """
         b_func = self.serialize(func, buffer_threshold=buffer_threshold)
         b_args = self.serialize(args, buffer_threshold=buffer_threshold)
@@ -101,7 +102,7 @@ class ParslSerializer(object):
             raise result
         else:
             if len(result) > buffer_threshold:
-                raise TypeError(f"Serialized object is too large and exceeds buffer threshold of {buffer_threshold} bytes")
+                logger.warning(f"Serialized object exceeds buffer threshold of {buffer_threshold} bytes, this could cause overflows")
             return result
 
     def deserialize(self, payload: bytes) -> Any:
