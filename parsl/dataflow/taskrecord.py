@@ -44,6 +44,7 @@ class TaskRecord(TypedDict, total=False):
 
     memoize: bool
     ignore_for_cache: Sequence[str]
+    from_memo: Optional[bool]
 
     id: int
     try_id: int
