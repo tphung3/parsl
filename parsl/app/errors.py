@@ -82,7 +82,6 @@ class MissingOutputs(ParslError):
     # vs PR 1846:  I use List[File] for outputs; this PR uses a union of str or File
     # That might be because I've done other tidyup work regarding strings and files?
 
-    # def __init__(self, reason: str, outputs: List[Union[str, File]]) -> None:
     def __init__(self, reason: str, outputs: List[File]) -> None:
         super().__init__(reason, outputs)
         self.reason = reason
@@ -97,26 +96,16 @@ class BadStdStreamFile(ParslError):
 
     Contains:
        reason(string)
-       outputs(List of strings/files..)
        exception object
     """
 
-    # TODO: [typing] This exception is never constructed with the first argument as a list. There
-    # are two spots where this constructor is called from:
-    #   - parsl.utils.get_std_fname_mode: invoked as __init__(message, exception)
-    #   - parsl.app.bash.open_std_fd: invoked as __init__(filename, exception)
-
-    # vs PR 1846  - seems like outputs is perhaps just a str and never the richer/conflicting
-    # type discussed in PR 1846 TODO directly above?
-
-    def __init__(self, outputs: str, exception: Exception) -> None:
-        super().__init__(outputs, exception)
-        self._outputs = outputs
+    def __init__(self, reason: str, exception: Exception) -> None:
+        super().__init__(reason, exception)
+        self._reason = reason
         self._exception = exception
 
     def __repr__(self) -> str:
-        return "FilePath: [{}] Exception: {}".format(self._outputs,
-                                                     self._exception)
+        return "Bad Stream File: {} Exception: {}".format(self._reason, self._exception)
 
     def __str__(self) -> str:
         return self.__repr__()

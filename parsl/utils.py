@@ -6,9 +6,7 @@ import subprocess
 import time
 import typeguard
 from contextlib import contextmanager
-
 from typing import Callable, List, Tuple, Union, Generator, IO, AnyStr, Dict
-
 from typing_extensions import Protocol, runtime_checkable
 
 import parsl
@@ -104,7 +102,7 @@ def get_last_checkpoint(rundir: str = "runinfo") -> List[str]:
 
 
 @typeguard.typechecked
-def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]):
+def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
     import parsl.app.errors as pe
     if stdfspec is None:
         return None, None
