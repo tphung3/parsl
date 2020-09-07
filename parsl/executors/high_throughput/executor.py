@@ -130,6 +130,13 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
     max_workers : int
         Caps the number of workers launched by the manager. Default: infinity
 
+    cpu_affinity: string
+        Whether or how each worker process sets thread affinity. Options are "none" to forgo
+        any CPU affinity configuration, "block" to assign adjacent cores to workers
+        (ex: assign 0-1 to worker 0, 2-3 to worker 1), and
+        "alternating" to assign cores to workers in round-robin
+        (ex: assign 0,2 to worker 0, 1,3 to worker 1).
+
     prefetch_capacity : int
         Number of tasks that could be prefetched over available worker capacity.
         When there are a few tasks (<100) or when tasks are long running, this option should
@@ -173,6 +180,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                  cores_per_worker: float = 1.0,
                  mem_per_worker: Optional[float] = None,
                  max_workers: Union[int, float] = float('inf'),
+                 cpu_affinity: str = 'none',
                  prefetch_capacity: int = 0,
                  heartbeat_threshold: int = 120,
                  heartbeat_period: int = 30,
@@ -228,6 +236,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         self.poll_period = poll_period
         self.run_dir = '.'
         self.worker_logdir_root = worker_logdir_root
+        self.cpu_affinity = cpu_affinity
 
         self._executor_exception = None
 
@@ -246,7 +255,8 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                                "--block_id={{block_id}} "
                                "--hb_period={heartbeat_period} "
                                "{address_probe_timeout_string} "
-                               "--hb_threshold={heartbeat_threshold} ")
+                               "--hb_threshold={heartbeat_threshold} "
+                               "--cpu-affinity {cpu_affinity} ")
 
     def initialize_scaling(self) -> None:
         """ Compose the launch command and call the scale_out
@@ -277,7 +287,8 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                                        heartbeat_period=self.heartbeat_period,
                                        heartbeat_threshold=self.heartbeat_threshold,
                                        poll_period=self.poll_period,
-                                       logdir=worker_logdir)
+                                       logdir=worker_logdir,
+                                       cpu_affinity=self.cpu_affinity)
         self.launch_cmd = l_cmd
         logger.debug("Launch command: {}".format(self.launch_cmd))
 
