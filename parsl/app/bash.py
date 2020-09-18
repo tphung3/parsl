@@ -142,7 +142,13 @@ class BashApp(AppBase):
         # this is done to avoid passing a function type in the args which parsl.serializer
         # doesn't support
         remote_fn = partial(update_wrapper(remote_side_bash_executor, self.func), self.func)
-        remote_fn.__name__ = self.func.__name__
+
+        # parsl/app/bash.py:145: error: "partial[Any]" has no attribute "__name__"
+        # but... other parts of the code are relying on getting the __name__
+        # of (?) an arbitrary Callable too (which is why we're setting the __name__
+        # at all)
+        remote_fn.__name__ = self.func.__name__  # type: ignore
+
         self.wrapped_remote_function = wrap_error(remote_fn)
 
     def __call__(self, *args, **kwargs):
