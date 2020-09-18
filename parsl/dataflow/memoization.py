@@ -73,7 +73,7 @@ def id_for_memo_list(denormalized_list: list, output_ref: bool = False) -> bytes
 
 
 @id_for_memo.register(tuple)
-def id_for_memo_tuple(denormalized_tuple, output_ref=False):
+def id_for_memo_tuple(denormalized_tuple: tuple, output_ref: bool = False) -> bytes:
     if type(denormalized_tuple) != tuple:
         raise ValueError("id_for_memo_tuple cannot work on subclasses of tuple")
 
