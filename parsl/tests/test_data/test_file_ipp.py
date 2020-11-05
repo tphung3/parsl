@@ -49,7 +49,8 @@ def test_regression_200():
         f.write("Hello World")
 
     fu = cat(inputs=[File("test.txt")],
-             outputs=[File("test_output.txt")])
+             outputs=[File("test_output.txt")],
+             stdout='r200.out', stderr='r200.err')
     fu.result()
 
     fi = fu.outputs[0].result()
