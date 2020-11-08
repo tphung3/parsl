@@ -169,8 +169,13 @@ class MonitoringHub(RepresentationMixin):
         resource_monitoring_interval : float
              The time interval, in seconds, at which the monitoring records the resource usage of each task. Default: 30 seconds
         """
-        self.logger = None
-        self._dfk_channel = None
+
+        # previously this was set in start() but logger exists at import so it can be set here and remove the optionality of self.logger's type
+        self.logger = logger  # type: logging.Logger
+
+
+        # this is awkward to type, because it is only initialised properly inside start. not sure what the right approach there is.
+        self._dfk_channel = None  # type: Any
 
         if _db_manager_excepts:
             raise(_db_manager_excepts)
@@ -200,7 +205,6 @@ class MonitoringHub(RepresentationMixin):
         os.makedirs(self.logdir, exist_ok=True)
 
         # Initialize the ZMQ pipe to the Parsl Client
-        self.logger = logger
         self.logger.info("Monitoring Hub initialized")
 
         self.logger.debug("Initializing ZMQ Pipes to client")
@@ -208,6 +212,7 @@ class MonitoringHub(RepresentationMixin):
         self.dfk_channel_timeout = 10000  # in milliseconds
         self._context = zmq.Context()
         self._dfk_channel = self._context.socket(zmq.DEALER)
+
         self._dfk_channel.setsockopt(zmq.SNDTIMEO, self.dfk_channel_timeout)
         self._dfk_channel.set_hwm(0)
         self.dfk_port = self._dfk_channel.bind_to_random_port("tcp://{}".format(self.client_address),
