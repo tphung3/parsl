@@ -173,7 +173,6 @@ class MonitoringHub(RepresentationMixin):
         # previously this was set in start() but logger exists at import so it can be set here and remove the optionality of self.logger's type
         self.logger = logger  # type: logging.Logger
 
-
         # this is awkward to type, because it is only initialised properly inside start. not sure what the right approach there is.
         self._dfk_channel = None  # type: Any
 
