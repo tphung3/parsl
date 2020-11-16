@@ -32,7 +32,7 @@ from parsl.executors.errors import ScalingFailed
 from parsl.executors.workqueue import exec_parsl_function
 
 import typeguard
-from typing import Dict, Optional, Sequence, Set
+from typing import Dict, List, Optional, Sequence, Set
 from parsl.data_provider.staging import Staging
 
 from .errors import WorkQueueTaskFailure
