@@ -1185,7 +1185,7 @@ class DataFlowKernel(object):
         return self._load_checkpoints(checkpointDirs)
 
     @staticmethod
-    def _log_std_streams(task_record):
+    def _log_std_streams(task_record: TaskRecord) -> None:
         if task_record['app_fu'].stdout is not None:
             logger.info("Standard output for task {} available at {}".format(task_record['id'], task_record['app_fu'].stdout))
         if task_record['app_fu'].stderr is not None:
