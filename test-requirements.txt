@@ -12,12 +12,5 @@ mypy==0.782
 sqlalchemy-stubs
 typing_extensions   # to get newer type checking features - specifically PEP 589 on python <3.8
 Sphinx==2.2.0
-typeguard>=2.5
-paramiko
-dill
-tblib
-psutil>=5.5.1
-globus-sdk
 twine
 wheel
-pyzmq>=17.1.2
