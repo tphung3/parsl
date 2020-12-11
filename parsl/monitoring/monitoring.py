@@ -173,7 +173,10 @@ class MonitoringHub(RepresentationMixin):
         # previously this was set in start() but logger exists at import so it can be set here and remove the optionality of self.logger's type
         self.logger = logger  # type: logging.Logger
 
-        # this is awkward to type, because it is only initialised properly inside start. not sure what the right approach there is.
+        # Any is used to disable typechecking on uses of _dfk_channel,
+        # because it is used in the code as if it points to a channel, but
+        # the static type is that it can also be None. The code relies on
+        # .start() being called and initialising this to a real channel.
         self._dfk_channel = None  # type: Any
 
         if _db_manager_excepts:
@@ -218,11 +221,11 @@ class MonitoringHub(RepresentationMixin):
                                                               min_port=self.client_port_range[0],
                                                               max_port=self.client_port_range[1])
 
-        comm_q = Queue(maxsize=10)  # type: Queue[Any]
-        self.exception_q = Queue(maxsize=10)  # type: Queue[Any]
-        self.priority_msgs = Queue()  # type: Queue[Any]
-        self.resource_msgs = Queue()  # type: Queue[Any]
-        self.node_msgs = Queue()  # type: Queue[Any]
+        comm_q = Queue(maxsize=10)  # type: Queue[Tuple[int, int]]
+        self.exception_q = Queue(maxsize=10)  # type: Queue[Tuple[str, str]]
+        self.priority_msgs = Queue()  # type: Queue[Tuple[Any, int]]
+        self.resource_msgs = Queue()  # type: Queue[Tuple[Any, Any]]
+        self.node_msgs = Queue()  # type: Queue[Tuple[Any, int]]
 
         self.router_proc = Process(target=router_starter,
                                    args=(comm_q, self.exception_q, self.priority_msgs, self.node_msgs, self.resource_msgs),
@@ -589,6 +592,3 @@ def monitor(pid,
 
         logging.debug("sleeping")
         time.sleep(sleep_dur)
-
-    # this statement is unreachable and that upsets mypy
-    # logger.info("Monitor exiting")
