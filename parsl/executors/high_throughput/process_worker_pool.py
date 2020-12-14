@@ -18,19 +18,20 @@ import json
 import psutil
 import multiprocessing
 
-from typing import Any, Dict, Type
+from typing import Any, Dict
 
 from parsl.version import VERSION as PARSL_VERSION
 from parsl.app.errors import RemoteExceptionWrapper
 from parsl.executors.high_throughput.errors import WorkerLost
 from parsl.executors.high_throughput.probe import probe_addresses
 
-mpQueue: Type
-
-if platform.system() == 'Darwin':
-    from parsl.executors.high_throughput.mac_safe_queue import MacSafeQueue as mpQueue
-else:
+# MYPY: flipped this so that mpQueue gets a type Type[Queue], rather than Type[mac_safe_queue]
+# This means that both imports satisfy that type annotation, as mac_safe_queue is a subclass
+# of multiprocessing.Queue, but not vice-versa.
+if platform.system() != 'Darwin':
     from multiprocessing import Queue as mpQueue
+else:
+    from parsl.executors.high_throughput.mac_safe_queue import MacSafeQueue as mpQueue
 
 from parsl.serialize import unpack_apply_message, serialize
 
@@ -183,9 +184,9 @@ class Manager(object):
                                 math.floor(cores_on_node / cores_per_worker))
         logger.info("Manager will spawn {} workers".format(self.worker_count))
 
-        self.pending_task_queue = mpQueue()
-        self.pending_result_queue = mpQueue()
-        self.ready_worker_queue = mpQueue()
+        self.pending_task_queue = mpQueue()  # type: mpQueue[Any]
+        self.pending_result_queue = mpQueue()  # type: mpQueue[Any]
+        self.ready_worker_queue = mpQueue()  # type: mpQueue[Any]
 
         self.max_queue_size = self.prefetch_capacity + self.worker_count
 
