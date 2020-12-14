@@ -220,7 +220,7 @@ class Interchange(object):
             self.worker_task_port, self.worker_result_port))
 
         # this could be tightened up plenty
-        self._ready_manager_queue = {}  # type: Dict[str, Any]
+        self._ready_manager_queue = {}  # type: Dict[bytes, Any]
 
         self.heartbeat_threshold = heartbeat_threshold
 
@@ -309,6 +309,8 @@ class Interchange(object):
             monitoring_enabled = True
             logger.info("[COMMAND] Monitoring enabled and connected to hub")
 
+        reply: Any  # the type of reply depends on the command_req received (aka this needs dependent types...)
+
         while not kill_event.is_set():
             try:
                 command_req = self.command_channel.recv_pyobj()
@@ -342,7 +344,8 @@ class Interchange(object):
                 elif command_req.startswith("HOLD_WORKER"):
                     cmd, s_manager = command_req.split(';')
                     manager = s_manager.encode('utf-8')
-                    logger.info("[CMD] Received HOLD_WORKER for {}".format(manager))
+                    # mypy dislikes using {} to format `bytes` (rather than strs) because it looks ugly. {!r} forces that.
+                    logger.info("[CMD] Received HOLD_WORKER for {!r}".format(manager))
                     if manager in self._ready_manager_queue:
                         self._ready_manager_queue[manager]['active'] = False
                         reply = True
