@@ -1163,6 +1163,7 @@ class DataFlowKernel(object):
                                                                                   len(memo_lookup_table.keys())))
         return memo_lookup_table
 
+    @typeguard.typechecked
     def load_checkpoints(self, checkpointDirs: Optional[List[str]]) -> 'Dict[str, Future[Any]]':
         """Load checkpoints from the checkpoint files into a dictionary.
 
@@ -1177,13 +1178,10 @@ class DataFlowKernel(object):
         """
         self.memo_lookup_table = None
 
-        if not checkpointDirs:
+        if checkpointDirs:
+            return self._load_checkpoints(checkpointDirs)
+        else:
             return {}
-
-        if type(checkpointDirs) is not list:
-            raise BadCheckpoint("checkpointDirs expects a list of checkpoints")
-
-        return self._load_checkpoints(checkpointDirs)
 
     @staticmethod
     def _log_std_streams(task_record: TaskRecord) -> None:
