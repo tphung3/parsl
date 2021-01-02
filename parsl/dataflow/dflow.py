@@ -1170,7 +1170,11 @@ class DataFlowKernel(object):
         return memo_lookup_table
 
     @typeguard.typechecked
-    def load_checkpoints(self, checkpointDirs: Optional[Sequence[str]]) -> 'Dict[str, Future[Any]]':
+    def load_checkpoints(self, checkpointDirs: Optional[Sequence[str]]) -> 'Dict[str, Future]':
+        # typeguard 2.10.1 cannot cope with Future[Any], giving a type-not-subscriptable error.
+        # Future with no subscript is probably equivalent though? I wanted the Any in there as
+        # an explicit note that I had the possibility of tighter typing but wasn't using it.
+        # def load_checkpoints(self, checkpointDirs: Optional[List[str]]) -> 'Dict[str, Future[Any]]':
         """Load checkpoints from the checkpoint files into a dictionary.
 
         The results are used to pre-populate the memoizer's lookup_table
