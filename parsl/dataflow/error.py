@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Sequence, Tuple
 
 
 class DataFlowException(Exception):
@@ -53,7 +53,7 @@ class DependencyError(DataFlowException):
     dependent_exceptions
     """
 
-    def __init__(self, dependent_exceptions_tids: List[Tuple[Exception, str]], task_id: int) -> None:
+    def __init__(self, dependent_exceptions_tids: Sequence[Tuple[Exception, str]], task_id: int) -> None:
         self.dependent_exceptions_tids = dependent_exceptions_tids
         self.task_id = task_id
 

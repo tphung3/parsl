@@ -638,7 +638,7 @@ class DataFlowKernel(object):
     def sanitize_and_wrap(self,
                           task_id: int,
                           args: Sequence[Any],
-                          kwargs: Dict[str, Any]) -> Tuple[Sequence[Any], Dict[str, Any], List[Tuple[Exception, str]]]:
+                          kwargs: Dict[str, Any]) -> Tuple[Sequence[Any], Dict[str, Any], Sequence[Tuple[Exception, str]]]:
         """This function should be called only when all the futures we track have been resolved.
 
         If the user hid futures a level below, we will not catch
