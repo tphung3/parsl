@@ -908,7 +908,7 @@ class DataFlowKernel(object):
         Parameters
         ----------
         provider: Provider obj
-           Provider for which scritps dirs are being created
+           Provider for which scripts dirs are being created
         channel: Channel obk
            Channel over which the remote dirs are to be created
         """
