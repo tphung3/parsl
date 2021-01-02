@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from typing import Any
 
 from parsl.dataflow.dflow import DataFlowKernel
+from parsl.dataflow.futures import AppFuture
 
 
 logger = logging.getLogger(__name__)
@@ -94,7 +95,7 @@ class AppBase(metaclass=ABCMeta):
         self.inputs = params['inputs'].default if 'inputs' in params else []
 
     @abstractmethod
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> AppFuture:
         pass
 
 

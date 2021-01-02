@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
+from parsl.dataflow.futures import AppFuture
 from parsl.app.errors import wrap_error
 from parsl.app.app import AppBase
 from parsl.dataflow.dflow import DataFlowKernelLoader
@@ -151,7 +152,7 @@ class BashApp(AppBase):
 
         self.wrapped_remote_function = wrap_error(remote_fn)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> AppFuture:
         """Handle the call to a Bash app.
 
         Args:

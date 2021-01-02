@@ -6,6 +6,7 @@ tblib.pickling_support.install()
 from parsl.app.app import AppBase
 from parsl.app.errors import wrap_error
 from parsl.dataflow.dflow import DataFlowKernelLoader
+from parsl.dataflow.futures import AppFuture
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ class PythonApp(AppBase):
             ignore_for_cache=ignore_for_cache
         )
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> AppFuture:
         """This is where the call to a python app is handled.
 
         Args:
