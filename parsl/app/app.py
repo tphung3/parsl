@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 from typing import Optional
 from typing import Union
 from typing import List
+from typing import Callable
 from typing_extensions import Literal
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ class AppBase(metaclass=ABCMeta):
     """
 
     @typeguard.typechecked
-    def __init__(self, func,
+    def __init__(self, func: Callable,
                  data_flow_kernel: Optional[DataFlowKernel] = None,
                  executors: Union[List[str], Literal['all']] = 'all',
                  cache: bool = False,
