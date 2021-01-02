@@ -1049,7 +1049,6 @@ class DataFlowKernel(object):
             run under RUNDIR/checkpoints/{tasks.pkl, dfk.pkl}
         """
         with self.checkpoint_lock:
-            # checkpoint_queue = None   # this line is unused - we always assign a new value in the following if statement # TODO push this removal to master
             if tasks:
                 checkpoint_queue = tasks  # type: Iterable[int]
             else:
