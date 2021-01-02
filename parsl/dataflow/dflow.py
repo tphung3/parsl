@@ -635,7 +635,10 @@ class DataFlowKernel(object):
 
         return depends
 
-    def sanitize_and_wrap(self, task_id: int, args: Sequence[Any], kwargs: Dict[str, Any]) -> Tuple[List[Any], Dict[str, Any], List[Tuple[Exception, str]]]:
+    def sanitize_and_wrap(self,
+                          task_id: int,
+                          args: Sequence[Any],
+                          kwargs: Dict[str, Any]) -> Tuple[Sequence[Any], Dict[str, Any], List[Tuple[Exception, str]]]:
         """This function should be called only when all the futures we track have been resolved.
 
         If the user hid futures a level below, we will not catch
@@ -712,7 +715,7 @@ class DataFlowKernel(object):
     def submit(self,
                func: Callable,
                app_args: Sequence[Any],
-               executors: Union[str, List[str]] = 'all',
+               executors: Union[str, Sequence[str]] = 'all',
                fn_hash: Optional[str] = None,
                cache: bool = False,
                ignore_for_cache: Optional[List[str]] = None,
@@ -1030,7 +1033,7 @@ class DataFlowKernel(object):
 
         logger.info("DFK cleanup complete")
 
-    def checkpoint(self, tasks: Optional[List[int]] = None) -> str:
+    def checkpoint(self, tasks: Optional[Sequence[int]] = None) -> str:
         """Checkpoint the dfk incrementally to a checkpoint file.
 
         When called, every task that has been completed yet not
@@ -1110,7 +1113,7 @@ class DataFlowKernel(object):
 
             return checkpoint_dir
 
-    def _load_checkpoints(self, checkpointDirs: 'List[str]') -> 'Dict[str, Future[Any]]':
+    def _load_checkpoints(self, checkpointDirs: 'Sequence[str]') -> 'Dict[str, Future[Any]]':
         """Load a checkpoint file into a lookup table.
 
         The data being loaded from the pickle file mostly contains input
@@ -1163,7 +1166,7 @@ class DataFlowKernel(object):
         return memo_lookup_table
 
     @typeguard.typechecked
-    def load_checkpoints(self, checkpointDirs: Optional[List[str]]) -> 'Dict[str, Future[Any]]':
+    def load_checkpoints(self, checkpointDirs: Optional[Sequence[str]]) -> 'Dict[str, Future[Any]]':
         """Load checkpoints from the checkpoint files into a dictionary.
 
         The results are used to pre-populate the memoizer's lookup_table
