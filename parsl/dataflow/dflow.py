@@ -718,6 +718,10 @@ class DataFlowKernel(object):
                executors: Union[str, Sequence[str]] = 'all',
                fn_hash: Optional[str] = None,
                cache: bool = False,
+               # turning ignore_for_cache into a Sequence gives a type error, because this
+               # argument is mutated later on. This makes me worried that there's a subtle
+               # bug here with mutation happening of a supplied parameter that might not
+               # be expected to be mutated.
                ignore_for_cache: Optional[List[str]] = None,
                app_kwargs: Dict[str, Any] = {}) -> AppFuture:
         """Add task to the dataflow system.
