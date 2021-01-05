@@ -35,7 +35,7 @@ class JobState(Enum):
         return state
 
     @property
-    def status_name(self) -> bool:
+    def status_name(self) -> str:
         (_, _, state) = self.value
         return state
 
@@ -62,7 +62,7 @@ class JobStatus(object):
         return self.state.terminal
 
     @property
-    def status_name(self):
+    def status_name(self) -> str:
         return self.state.status_name
 
     def __repr__(self) -> str:

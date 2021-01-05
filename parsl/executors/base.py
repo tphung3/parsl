@@ -43,9 +43,10 @@ class ParslExecutor(metaclass=ABCMeta):
     outstanding: Any  # what is this? used by strategy
     working_dir: Optional[str]
     storage_access: Optional[Sequence[Staging]]
+    run_id: Optional[str]
 
     @abstractmethod
-    def start(self) -> Optional[List[str]]:
+    def start(self) -> Optional[List[object]]:
         """Start the executor.
 
         Any spin-up operations (for example: starting thread pools) should be performed here.
@@ -115,8 +116,15 @@ class ParslExecutor(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def create_monitoring_info(self, status: Dict[object, JobStatus]) -> List[object]:
+    def create_monitoring_info(self, status: Dict[object, JobStatus], block_id_type: str = 'external') -> List[object]:
         """Create a monitoring message for each block based on the poll status.
+
+        TODO: block_id_type should be an enumerated list of valid strings, rather than all strings
+
+        TODO: there shouldn't be any default values for this - when it is invoked, it should be explicit which is needed?
+        Neither seems more natural to me than the other.
+
+        TODO: internal vs external should be more clearly documented here
 
         :return: a list of dictionaries mapping to the info of each block
         """

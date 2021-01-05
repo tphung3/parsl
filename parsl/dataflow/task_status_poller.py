@@ -10,6 +10,7 @@ from parsl.dataflow.job_error_handler import JobErrorHandler
 from parsl.dataflow.strategy import Strategy
 from parsl.executors.base import ParslExecutor
 from parsl.monitoring.message_type import MessageType
+from parsl.monitoring.monitoring import MonitoringHub
 
 from parsl.providers.provider_base import JobStatus, JobState
 
@@ -26,7 +27,13 @@ class PollItem(ExecutorStatus):
 
         # Create a ZMQ channel to send poll status to monitoring
         self.monitoring_enabled = False
-        if self._dfk.monitoring is not None:
+
+        # mypy 0.790 cannot determine the type for self._dfk.monitoring
+        # even though it can determine that _dfk is a DFK. Perhaps because of
+        # the same cyclic import that makes DataFlowKernel need to be quoted
+        # in the __init__ type signature?
+        # So explicitly ignore this type problem.
+        if self._dfk.monitoring is not None:  # type: ignore
             self.monitoring_enabled = True
             hub_address = self._dfk.hub_address
             hub_port = self._dfk.hub_interchange_port
@@ -45,7 +52,8 @@ class PollItem(ExecutorStatus):
             self._last_poll_time = now
             self.send_monitoring_info(self._status, block_id_type='internal')
 
-    def send_monitoring_info(self, status=None, block_id_type='external'):
+    # status: isn't optional so shoudln't default to None. I think?
+    def send_monitoring_info(self, status: Dict, block_id_type: str = 'external') -> None:
         # Send monitoring info for HTEX when monitoring enabled
         if self.monitoring_enabled:
             msg = self._executor.create_monitoring_info(status,

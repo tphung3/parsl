@@ -262,7 +262,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                                "--hb_threshold={heartbeat_threshold} "
                                "--cpu-affinity {cpu_affinity} ")
 
-    def initialize_scaling(self) -> None:
+    def initialize_scaling(self) -> List[object]:
         """ Compose the launch command and call the scale_out
 
         This should be implemented in the child classes to take care of
@@ -300,7 +300,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         logger.debug("Starting HighThroughputExecutor with provider:\n%s", self.provider)
 
         # TODO: why is this a provider property?
-        jids = []
+        jids = []  # type: List[object]
         if hasattr(self.provider, 'init_blocks'):
             try:
                 jids = self.scale_out(blocks=self.provider.init_blocks)
@@ -309,7 +309,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                 raise e
         return jids
 
-    def start(self) -> None:
+    def start(self) -> Optional[List[object]]:
         """Create the Interchange process and connect to it.
         """
         self.outgoing_q = zmq_pipes.TasksOutgoing("127.0.0.1", self.interchange_port_range)
@@ -596,7 +596,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         """
         msg = []
         for id, s in status.items():
-            d = {}
+            d: Dict[str, Any] = {}
             d['run_id'] = self.run_id
             d['status'] = s.status_name
             d['timestamp'] = datetime.datetime.now()
