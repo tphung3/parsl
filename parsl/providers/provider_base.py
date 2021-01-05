@@ -20,18 +20,23 @@ logger = logging.getLogger(__name__)
 class JobState(Enum):
     """Defines a set of states that a job can be in"""
 
-    UNKNOWN = (0, False)
-    PENDING = (1, False)
-    RUNNING = (2, False)
-    CANCELLED = (3, True)
-    COMPLETED = (4, True)
-    FAILED = (5, True)
-    TIMEOUT = (6, True)
-    HELD = (7, False)
+    UNKNOWN = (0, False, "UNKNOWN")
+    PENDING = (1, False, "PENDING")
+    RUNNING = (2, False, "RUNNING")
+    CANCELLED = (3, True, "CANCELLED")
+    COMPLETED = (4, True, "COMPLETED")
+    FAILED = (5, True, "FAILED")
+    TIMEOUT = (6, True, "TIMEOUT")
+    HELD = (7, False, "HELD")
 
     @property
     def terminal(self) -> bool:
-        (_, state) = self.value
+        (_, state, _) = self.value
+        return state
+
+    @property
+    def status_name(self) -> bool:
+        (_, _, state) = self.value
         return state
 
 
@@ -55,6 +60,10 @@ class JobStatus(object):
     @property
     def terminal(self) -> bool:
         return self.state.terminal
+
+    @property
+    def status_name(self):
+        return self.state.status_name
 
     def __repr__(self) -> str:
         if self.message is not None:
