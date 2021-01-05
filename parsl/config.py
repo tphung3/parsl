@@ -1,7 +1,7 @@
 import logging
 import typeguard
 
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from parsl.utils import RepresentationMixin
 from parsl.executors.base import ParslExecutor
@@ -67,7 +67,7 @@ class Config(RepresentationMixin):
     def __init__(self,
                  executors: Optional[List[ParslExecutor]] = None,
                  app_cache: bool = True,
-                 checkpoint_files: Optional[List[str]] = None,
+                 checkpoint_files: Optional[Sequence[str]] = None,
                  checkpoint_mode: Optional[str] = None,
                  checkpoint_period: Optional[str] = None,
                  internal_tasks_max_threads: int = 10,
