@@ -5,5 +5,4 @@ dill
 tblib
 requests
 paramiko
-mypy>=0.710
 psutil>=5.5.1
