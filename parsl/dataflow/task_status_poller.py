@@ -10,7 +10,6 @@ from parsl.dataflow.job_error_handler import JobErrorHandler
 from parsl.dataflow.strategy import Strategy
 from parsl.executors.base import ParslExecutor
 from parsl.monitoring.message_type import MessageType
-from parsl.monitoring.monitoring import MonitoringHub
 
 from parsl.providers.provider_base import JobStatus, JobState
 
