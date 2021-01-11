@@ -94,6 +94,11 @@ class ParslExecutor(metaclass=ABCMeta):
         which will have the scaling methods, scale_in itself should be a coroutine, since
         scaling tasks can be slow.
 
+        MYPY branch notes: the scale in calls in strategy expect there to be many
+        more parameters to this. This maybe could be resolved by treating a
+        status providing executor as more generally a strategy-scalable
+        executor, and having strategies statically typed to work on those.
+
         :return: A list of job ids corresponding to the blocks that were removed.
         """
         pass

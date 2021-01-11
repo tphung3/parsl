@@ -2,7 +2,7 @@ import logging
 import parsl  # noqa F401 (used in string type annotation)
 import time
 import zmq
-from typing import cast, Dict, Sequence, Optional
+from typing import Any, cast, Dict, Sequence, Optional
 from typing import List  # noqa F401 (used in type annotation)
 
 from parsl.dataflow.executor_status import ExecutorStatus
@@ -68,8 +68,16 @@ class PollItem(ExecutorStatus):
     def executor(self) -> ParslExecutor:
         return self._executor
 
-    def scale_in(self, n: int) -> List[object]:
-        ids = self._executor.scale_in(n)
+    def scale_in(self, n: int, force: bool = True, max_idletime: Optional[float] = None) -> List[object]:
+        if force and not max_idletime:
+            ids = self._executor.scale_in(n)
+        else:
+            # this cast is because ParslExecutor.scale_in doesn't have force or max_idletime parameters
+            # so we just hope that the actual executor happens to have them.
+            # see some notes in ParslExecutor about making the status handling superclass into a
+            # class that holds all the scaling methods, so that everything can be specialised
+            # to work on those.
+            ids = cast(Any, self._executor).scale_in(n, force=force, max_idletime=max_idletime)
         if ids is not None:
             new_status = {}
             for id in ids:
