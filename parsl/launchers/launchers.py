@@ -507,10 +507,3 @@ wait
            overrides=self.overrides,
            debug=debug_num)
         return x
-
-
-if __name__ == '__main__':
-
-    s = SingleNodeLauncher()
-    wrapped = s("hello", 1, 1)
-    print(wrapped)
