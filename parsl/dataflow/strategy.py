@@ -166,9 +166,6 @@ class Strategy(object):
 
         Args:
             - tasks (task_ids): Not used here.
-
-        KWargs:
-            - kind (Not used)
         """
 
     def unset_logging(self) -> None:
@@ -208,9 +205,6 @@ class Strategy(object):
 
         Args:
             - tasks (task_ids): Not used here.
-
-        KWargs:
-            - kind (Not used)
         """
         for exec_status in status_list:
             executor = exec_status.executor
