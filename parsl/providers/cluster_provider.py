@@ -72,10 +72,9 @@ class ClusterProvider(ExecutionProvider, Channeled):
         self.cmd_timeout = cmd_timeout
 
         # TODO: this test should be for being a launcher, not being callable
-        if not callable(self.launcher):
+        if not isinstance(self.launcher, Launcher):
             raise(BadLauncher(self.launcher,
-                              "Launcher for executor: {} is of type: {}. Expects a parsl.launcher.launcher.Launcher or callable".format(
-                                  label, type(self.launcher))))
+                              "Launcher for executor: {} is of type: {}. Expects a parsl.launcher.launcher.Launcher".format(label, type(self.launcher))))
 
         self.script_dir = None
 
