@@ -34,6 +34,7 @@ def address_by_route() -> str:
     return addr
 
 
+@typeguard.typechecked
 def address_by_query(timeout: float = 30) -> str:
     """Finds an address for the local host by querying ipify. This may
        return an unusable value when the host is behind NAT, or when the
