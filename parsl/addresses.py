@@ -16,7 +16,7 @@ import struct
 import typeguard
 import psutil
 
-from typing import List, Set, Callable
+from typing import Set, List, Callable
 
 logger = logging.getLogger(__name__)
 
