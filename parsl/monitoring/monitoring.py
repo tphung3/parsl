@@ -12,7 +12,7 @@ from multiprocessing import Process, Queue
 from parsl.utils import RepresentationMixin
 
 from parsl.monitoring.message_type import MessageType
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 _db_manager_excepts: Optional[Exception]
 
@@ -221,7 +221,7 @@ class MonitoringHub(RepresentationMixin):
                                                               min_port=self.client_port_range[0],
                                                               max_port=self.client_port_range[1])
 
-        comm_q = Queue(maxsize=10)  # type: Queue[Tuple[int, int]]
+        comm_q = Queue(maxsize=10)  # type: Queue[Union[Tuple[int, int], str]]
         self.exception_q = Queue(maxsize=10)  # type: Queue[Tuple[str, str]]
         self.priority_msgs = Queue()  # type: Queue[Tuple[Any, int]]
         self.resource_msgs = Queue()  # type: Queue[Tuple[Any, Any]]
