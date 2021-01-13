@@ -222,7 +222,7 @@ class DataFlowKernel(object):
         task_log_info["task_func_name"] = task_record['func_name']
         task_log_info["task_fn_hash"] = task_record['fn_hash']
         task_log_info["task_memoize"] = task_record['memoize']
-        task_log_info["task_hashsum"] = task_record['memoize']
+        task_log_info["task_hashsum"] = task_record['hashsum']
         task_log_info["task_fail_count"] = task_record['fail_count']
         task_log_info["task_status"] = task_record['status']
         task_log_info["task_id"] = task_record['id']
