@@ -23,10 +23,10 @@ class Launcher(RepresentationMixin, metaclass=ABCMeta):
 class SimpleLauncher(Launcher):
     """ Does no wrapping. Just returns the command as-is
     """
-    def __init_(self, debug: bool = True):
+    def __init_(self, debug: bool = True) -> None:
         super().__init__(debug=debug)
 
-    def __call__(self, command: str, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -50,7 +50,7 @@ class WrappedLauncher(Launcher):
         super().__init__(debug=debug)
         self.prepend = prepend
 
-    def __call__(self, command, tasks_per_node, nodes_per_block, debug=True):
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int, debug: bool = True) -> str:
         if tasks_per_node > 1:
             logger.warning('WrappedLauncher ignores the number of tasks per node. '
                            'You may be getting fewer workers than expected')
@@ -72,7 +72,7 @@ class SingleNodeLauncher(Launcher):
         super().__init__(debug=debug)
         self.fail_on_any = fail_on_any
 
-    def __call__(self, command, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -142,7 +142,7 @@ class GnuParallelLauncher(Launcher):
     def __init__(self, debug: bool = True):
         super().__init__(debug=debug)
 
-    def __call__(self, command, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -206,7 +206,7 @@ class MpiExecLauncher(Launcher):
     def __init__(self, debug: bool = True):
         super().__init__(debug=debug)
 
-    def __call__(self, command, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -258,7 +258,7 @@ class MpiRunLauncher(Launcher):
         super().__init__(debug=debug)
         self.bash_location = bash_location
 
-    def __call__(self, command, tasks_per_node, nodes_per_block):
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -305,7 +305,7 @@ class SrunLauncher(Launcher):
         super().__init__(debug=debug)
         self.overrides = overrides
 
-    def __call__(self, command, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -357,7 +357,7 @@ class SrunMPILauncher(Launcher):
         super().__init__(debug=debug)
         self.overrides = overrides
 
-    def __call__(self, command, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -429,7 +429,7 @@ class AprunLauncher(Launcher):
         super().__init__(debug=debug)
         self.overrides = overrides
 
-    def __call__(self, command, tasks_per_node, nodes_per_block) -> str:
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
@@ -477,7 +477,7 @@ class JsrunLauncher(Launcher):
         super().__init__(debug=debug)
         self.overrides = overrides
 
-    def __call__(self, command, tasks_per_node, nodes_per_block):
+    def __call__(self, command: str, tasks_per_node: int, nodes_per_block: int) -> str:
         """
         Args:
         - command (string): The command string to be launched
