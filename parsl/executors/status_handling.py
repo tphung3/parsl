@@ -78,9 +78,6 @@ class StatusHandlingExecutor(ParslExecutor):
 
         return status
 
-    def create_monitoring_info(self, status: Dict[object, JobStatus], block_id_type: str = 'external') -> List[object]:
-        return []
-
     def set_bad_state_and_fail_all(self, exception: Exception):
         logger.exception("Exception: {}".format(exception))
         self._executor_exception = exception
@@ -155,11 +152,6 @@ class NoStatusHandlingExecutor(ParslExecutor):
 
     def status(self):
         return {}
-
-    # does this and the one in StatusHandlingExecutor need to have a create_monitoring_info impl?
-    # or leave it to be abstract from the superclass and force it to be implemented by subclasses?
-    def create_monitoring_info(self, status: Dict[object, JobStatus], block_id_type: str = 'external') -> List[object]:
-        return []
 
     def handle_errors(self, error_handler: "parsl.dataflow.job_error_handler.JobErrorHandler",
                       status: Dict[Any, JobStatus]) -> bool:

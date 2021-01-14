@@ -120,7 +120,6 @@ class ParslExecutor(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
     def create_monitoring_info(self, status: Dict[object, JobStatus], block_id_type: str = 'external') -> List[object]:
         """Create a monitoring message for each block based on the poll status.
 
@@ -133,7 +132,7 @@ class ParslExecutor(metaclass=ABCMeta):
 
         :return: a list of dictionaries mapping to the info of each block
         """
-        pass
+        return []
 
     @abstractmethod
     def status(self) -> Dict[object, JobStatus]:
