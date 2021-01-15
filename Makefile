@@ -49,8 +49,9 @@ mypy: ## run mypy checks
 	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/configs/
 	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/sites/
 	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/
-	PYTHONPATH=$(pwd):$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/*.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/*py
+	PYTHONPATH=$(pwd):$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/*.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/*py parsl/monitoring/*py
 
+        # only the top level of monitoring is checked here because the visualization code does not type check
 
 .PHONY: local_thread_test
 local_thread_test: ## run all tests with local_thread config
