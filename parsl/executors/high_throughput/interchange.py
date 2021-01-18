@@ -183,14 +183,6 @@ class Interchange(object):
         self.hub_address = hub_address
         self.hub_port = hub_port
 
-        self.monitoring_enabled = False
-        if hub_address and hub_port:
-            self.hub_channel = self.context.socket(zmq.DEALER)
-            self.hub_channel.set_hwm(0)
-            self.hub_channel.connect("tcp://{}:{}".format(hub_address, hub_port))
-            self.monitoring_enabled = True
-            logger.info("Monitoring enabled and connected to hub")
-
         self.pending_task_queue = queue.Queue(maxsize=10 ** 6)  # type: queue.Queue[Any]
 
         self.worker_ports = worker_ports
@@ -288,12 +280,23 @@ class Interchange(object):
                 task_counter += 1
                 logger.debug("[TASK_PULL_THREAD] Fetched task:{}".format(task_counter))
 
-    def _send_monitoring_info(self, manager):
-        if self.monitoring_enabled:
+    def _create_monitoring_channel(self):
+        if self.hub_address and self.hub_port:
+            logger.info("Connecting to monitoring")
+            hub_channel = self.context.socket(zmq.DEALER)
+            hub_channel.set_hwm(0)
+            hub_channel.connect("tcp://{}:{}".format(self.hub_address, self.hub_port))
+            logger.info("Monitoring enabled and connected to hub")
+            return hub_channel
+        else:
+            return None
+
+    def _send_monitoring_info(self, hub_channel, manager):
+        if hub_channel:
             logger.info("Sending message {} to hub".format(self._ready_manager_queue[manager]))
-            self.hub_channel.send_pyobj((MessageType.NODE_INFO,
-                                         datetime.datetime.now(),
-                                         self._ready_manager_queue[manager]))
+            hub_channel.send_pyobj((MessageType.NODE_INFO,
+                                    datetime.datetime.now(),
+                                    self._ready_manager_queue[manager]))
 
     def _command_server(self, kill_event):
         """ Command server to run async command to the interchange
@@ -301,13 +304,7 @@ class Interchange(object):
         logger.debug("[COMMAND] Command Server Starting")
 
         # Need to create a new ZMQ socket for command server thread
-        monitoring_enabled = False
-        if self.hub_address and self.hub_port:
-            hub_channel = self.context.socket(zmq.DEALER)
-            hub_channel.set_hwm(0)
-            hub_channel.connect("tcp://{}:{}".format(self.hub_address, self.hub_port))
-            monitoring_enabled = True
-            logger.info("[COMMAND] Monitoring enabled and connected to hub")
+        hub_channel = self._create_monitoring_channel()
 
         reply: Any  # the type of reply depends on the command_req received (aka this needs dependent types...)
 
@@ -349,11 +346,7 @@ class Interchange(object):
                     if manager in self._ready_manager_queue:
                         self._ready_manager_queue[manager]['active'] = False
                         reply = True
-                        if monitoring_enabled:
-                            logger.info("[COMMAND] Sending message {} to hub".format(self._ready_manager_queue[manager]))
-                            hub_channel.send_pyobj((MessageType.NODE_INFO,
-                                                    datetime.datetime.now(),
-                                                    self._ready_manager_queue[manager]))
+                        self._send_monitoring_info(hub_channel, manager)
                     else:
                         reply = False
 
@@ -381,6 +374,8 @@ class Interchange(object):
         TODO: Move task receiving to a thread
         """
         logger.info("Incoming ports bound")
+
+        hub_channel = self._create_monitoring_channel()
 
         if poll_period is None:
             poll_period = self.poll_period
@@ -445,7 +440,7 @@ class Interchange(object):
                         logger.info("[MAIN] Adding manager: {} to ready queue".format(manager))
                         self._ready_manager_queue[manager].update(msg)
                         logger.info("[MAIN] Registration info for manager {}: {}".format(manager, msg))
-                        self._send_monitoring_info(manager)
+                        self._send_monitoring_info(hub_channel, manager)
 
                         if (msg['python_v'].rsplit(".", 1)[0] != self.current_platform['python_v'].rsplit(".", 1)[0] or
                             msg['parsl_v'] != self.current_platform['parsl_v']):
@@ -553,7 +548,7 @@ class Interchange(object):
                 logger.warning("[MAIN] Too many heartbeats missed for manager {}".format(manager))
                 if self._ready_manager_queue[manager]['active']:
                     self._ready_manager_queue[manager]['active'] = False
-                    self._send_monitoring_info(manager)
+                    self._send_monitoring_info(hub_channel, manager)
 
                 for tid in self._ready_manager_queue[manager]['tasks']:
                     try:
