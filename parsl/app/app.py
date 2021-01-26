@@ -5,8 +5,6 @@ The App class encapsulates a generic leaf task that can be executed asynchronous
 import logging
 import typeguard
 from abc import ABCMeta, abstractmethod
-from inspect import getsource
-from hashlib import md5
 from inspect import signature
 
 from typing import TYPE_CHECKING
@@ -69,17 +67,6 @@ class AppBase(metaclass=ABCMeta):
         # if not (isinstance(executors, list) or isinstance(executors, str)):
         #    logger.error("App {} specifies invalid executor option, expects string or list".format(
         #        func.__name__))
-
-        if cache is True:
-            try:
-                self.fn_source = getsource(func)
-            except OSError:
-                logger.warning("Unable to get source code for app caching. Recommend creating module")
-                self.fn_source = func.__name__
-
-            self.func_hash = md5(self.fn_source.encode('utf-8')).hexdigest()
-        else:
-            self.func_hash = func.__name__
 
         params = signature(func).parameters
 

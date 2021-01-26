@@ -1,6 +1,7 @@
 from __future__ import annotations
 import hashlib
-from functools import singledispatch
+from functools import lru_cache, singledispatch
+from inspect import getsource
 import logging
 from parsl.dataflow.taskrecord import TaskRecord
 
@@ -53,7 +54,6 @@ def id_for_memo(obj: object, output_ref: bool = False) -> bytes:
 @id_for_memo.register(str)
 @id_for_memo.register(int)
 @id_for_memo.register(float)
-@id_for_memo.register(types.FunctionType)
 @id_for_memo.register(type(None))
 def id_for_memo_serialize(obj: object, output_ref: bool = False) -> bytes:
     return serialize(obj)
@@ -102,6 +102,28 @@ def id_for_memo_dict(denormalized_dict: dict, output_ref: bool = False) -> bytes
         normalized_list.append(id_for_memo(k))
         normalized_list.append(id_for_memo(denormalized_dict[k], output_ref=output_ref))
     return serialize(normalized_list)
+
+
+# the LRU cache decorator must be applied closer to the id_for_memo_function call
+# that the .register() call, so that the cache-decorated version is registered.
+@id_for_memo.register(types.FunctionType)
+@lru_cache()
+def id_for_memo_function(function: types.FunctionType, output_ref: bool = False) -> bytes:
+    """This produces function hash material using the source definition of the
+       function.
+
+       The standard serialize_object based approach cannot be used as it is
+       too sensitive to irrelevant facts such as the source line, meaning
+       a whitespace line added at the top of a source file will cause the hash
+       to change.
+    """
+    logger.debug("serialising id_for_memo_function for function {}, type {}".format(function, type(function)))
+    try:
+        fn_source = getsource(function)
+    except Exception as e:
+        logger.warning("Unable to get source code for app caching. Recommend creating module. Exception was: {}".format(e))
+        fn_source = function.__name__
+    return serialize(fn_source.encode('utf-8'))
 
 
 class Memoizer(object):
@@ -190,8 +212,7 @@ class Memoizer(object):
             t = t + [id_for_memo(outputs, output_ref=True)]   # TODO: use append?
 
         t = t + [id_for_memo(filtered_kw)]
-        t = t + [id_for_memo(task['func_name']),
-                 id_for_memo(task['fn_hash']),
+        t = t + [id_for_memo(task['func']),
                  id_for_memo(task['args'])]
 
         x = b''.join(t)

@@ -220,7 +220,6 @@ class DataFlowKernel(object):
         task_log_info = {}  # type: Dict[str, Any]
 
         task_log_info["task_func_name"] = task_record['func_name']
-        task_log_info["task_fn_hash"] = task_record['fn_hash']
         task_log_info["task_memoize"] = task_record['memoize']
         task_log_info["task_hashsum"] = task_record['hashsum']
         task_log_info["task_fail_count"] = task_record['fail_count']
@@ -725,7 +724,6 @@ class DataFlowKernel(object):
                func: Callable,
                app_args: Sequence[Any],
                executors: Union[str, Sequence[str]] = 'all',
-               fn_hash: Optional[str] = None,
                cache: bool = False,
                # turning ignore_for_cache into a Sequence gives a type error, because this
                # argument is mutated later on. This makes me worried that there's a subtle
@@ -747,8 +745,6 @@ class DataFlowKernel(object):
             - app_args : Args to the function
             - executors (list or string) : List of executors this call could go to.
                     Default='all'
-            - fn_hash (Str) : Hash of the function and inputs
-                    Default=None
             - cache (Bool) : To enable memoization or not
             - ignore_for_cache (list) : List of kwargs to be ignored for memoization/checkpointing
             - app_kwargs (dict) : Rest of the kwargs to the fn passed as dict.
@@ -798,7 +794,6 @@ class DataFlowKernel(object):
 
         task_def = {'executor': executor,
                     'func_name': func.__name__,
-                    'fn_hash': fn_hash,
                     'memoize': cache,
                     'hashsum': None,
                     'exec_fu': None,
