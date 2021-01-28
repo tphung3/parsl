@@ -171,10 +171,10 @@ class ExecutionProvider(metaclass=ABCMeta):
     nodes_per_block: int
     script_dir: Optional[str]
     parallelism: float  # TODO not sure about this one?
-    resources: Dict[Any, Any]  # I think the contents of this are provider-specific?
+    resources: Dict[object, Any]  # I think the contents of this are provider-specific?
 
     @abstractmethod
-    def submit(self, command: str, tasks_per_node: int, job_name: str = "parsl.auto") -> Any:
+    def submit(self, command: str, tasks_per_node: int, job_name: str = "parsl.auto") -> object:
         ''' The submit method takes the command string to be executed upon
         instantiation of a resource most often to start a pilot (such as IPP engine
         or even Swift-T engines).
@@ -198,7 +198,7 @@ class ExecutionProvider(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def status(self, job_ids: List[Any]) -> List[JobStatus]:
+    def status(self, job_ids: List[object]) -> List[JobStatus]:
         ''' Get the status of a list of jobs identified by the job identifiers
         returned from the submit request.
 
@@ -216,7 +216,7 @@ class ExecutionProvider(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def cancel(self, job_ids: List[Any]) -> List[bool]:
+    def cancel(self, job_ids: List[object]) -> List[bool]:
         ''' Cancels the resources identified by the job_ids provided by the user.
 
         Args:
