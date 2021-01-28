@@ -105,3 +105,8 @@ class ThreadPoolExecutor(NoStatusHandlingExecutor, RepresentationMixin):
         self.executor.shutdown(wait=block)
         logger.debug("Done with executor shutdown")
         return True
+
+    def monitor_resources(self):
+        """Resource monitoring sometimes deadlocks when using threads, so this function
+        returns false to disable it."""
+        return False
