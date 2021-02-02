@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 class StatusHandlingExecutor(ParslExecutor):
     def __init__(self, provider: ExecutionProvider):
         super().__init__()
-        self._provider = provider
-        # errors can happen during the sumbit call to the provider; this is used
+        self._provider = provider  # type: ExecutionProvider
+        # errors can happen during the submit call to the provider; this is used
         # to keep track of such errors so that they can be handled in one place
         # together with errors reported by status()
         self._simulated_status = {}  # type: Dict[object, JobStatus]
