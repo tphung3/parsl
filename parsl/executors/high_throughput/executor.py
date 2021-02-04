@@ -300,9 +300,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         logger.debug("Starting HighThroughputExecutor with provider:\n%s", self.provider)
 
         # TODO: why is this a provider property?
-
         block_ids = []  # type: List[str]
-
         if hasattr(self.provider, 'init_blocks'):
             try:
                 block_ids = self.scale_out(blocks=self.provider.init_blocks)
@@ -613,7 +611,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         """Scales out the number of blocks by "blocks"
         """
         if not self.provider:
-            raise (ScalingFailed(self.label, "No execution provider available"))
+            raise (ScalingFailed(None, "No execution provider available"))
         block_ids = []  # type: List[str]
         for i in range(blocks):
             block_id = str(len(self.blocks))
