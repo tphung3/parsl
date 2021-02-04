@@ -72,7 +72,7 @@ class PollItem(ExecutorStatus):
     def executor(self) -> ParslExecutor:
         return self._executor
 
-    def scale_in(self, n: int, force: bool = True, max_idletime: Optional[float] = None) -> List[object]:
+    def scale_in(self, n: int, force: bool = True, max_idletime: Optional[float] = None) -> List[str]:
         if force and not max_idletime:
             block_ids = self._executor.scale_in(n)
         else:
@@ -90,7 +90,7 @@ class PollItem(ExecutorStatus):
             self.send_monitoring_info(new_status)
         return block_ids
 
-    def scale_out(self, n) -> List[str]:
+    def scale_out(self, n: int) -> List[str]:
         block_ids = self._executor.scale_out(n)
         if block_ids is not None:
             new_status = {}
