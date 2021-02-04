@@ -73,7 +73,7 @@ class ThreadPoolExecutor(NoStatusHandlingExecutor, RepresentationMixin):
 
         return self.executor.submit(func, *args, **kwargs)
 
-    def scale_out(self, workers: int = 1) -> List[object]:
+    def scale_out(self, workers: int = 1) -> List[str]:
         """Scales out the number of active workers by 1.
 
         This method is notImplemented for threads and will raise the error if called.
@@ -84,7 +84,7 @@ class ThreadPoolExecutor(NoStatusHandlingExecutor, RepresentationMixin):
 
         raise NotImplementedError
 
-    def scale_in(self, blocks) -> List[object]:
+    def scale_in(self, blocks) -> List[str]:
         """Scale in the number of active blocks by specified amount.
 
         This method is not implemented for threads and will raise the error if called.

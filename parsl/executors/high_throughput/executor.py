@@ -201,7 +201,6 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         self.managed = managed
         self.blocks = {}  # type: Dict[str, str]
         self.block_mapping = {}  # type: Dict[str, str]
-        self.removed_block_mapping = {}  # type: Dict[str, str]
         self.cores_per_worker = cores_per_worker
         self.mem_per_worker = mem_per_worker
         self.max_workers = max_workers
@@ -263,7 +262,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                                "--hb_threshold={heartbeat_threshold} "
                                "--cpu-affinity {cpu_affinity} ")
 
-    def initialize_scaling(self) -> List[object]:
+    def initialize_scaling(self) -> List[str]:
         """ Compose the launch command and call the scale_out
 
         This should be implemented in the child classes to take care of
@@ -301,16 +300,18 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         logger.debug("Starting HighThroughputExecutor with provider:\n%s", self.provider)
 
         # TODO: why is this a provider property?
-        jids = []  # type: List[object]
+
+        block_ids = []  # type: List[str]
+
         if hasattr(self.provider, 'init_blocks'):
             try:
-                jids = self.scale_out(blocks=self.provider.init_blocks)
+                block_ids = self.scale_out(blocks=self.provider.init_blocks)
             except Exception as e:
                 logger.error("Scaling out failed: {}".format(e))
                 raise e
-        return jids
+        return block_ids
 
-    def start(self) -> Optional[List[object]]:
+    def start(self) -> Optional[List[str]]:
         """Create the Interchange process and connect to it.
         """
         self.outgoing_q = zmq_pipes.TasksOutgoing("127.0.0.1", self.interchange_port_range)
@@ -325,8 +326,8 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
 
         logger.debug("Created management thread: {}".format(self._queue_management_thread))
 
-        jids = self.initialize_scaling()
-        return jids
+        block_ids = self.initialize_scaling()
+        return block_ids
 
     @wrap_with_logs
     def _queue_management_worker(self) -> None:
@@ -592,61 +593,52 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
     def scaling_enabled(self):
         return self._scaling_enabled
 
-    def create_monitoring_info(self, status, block_id_type='external'):
+    def create_monitoring_info(self, status):
         """ Create a msg for monitoring based on the poll status
 
         """
         msg = []
-        for id, s in status.items():
+        for bid, s in status.items():
             d: Dict[str, Any] = {}
             d['run_id'] = self.run_id
             d['status'] = s.status_name
             d['timestamp'] = datetime.datetime.now()
             d['executor_label'] = self.label
-            if block_id_type == 'internal':
-                d['job_id'] = id
-                if id in self.block_mapping:
-                    d['block_id'] = self.block_mapping[id]
-                else:
-                    d['block_id'] = self.removed_block_mapping.pop(id)
-            elif block_id_type == 'external':
-                d['job_id'] = self.blocks[id]
-                d['block_id'] = id
-            else:
-                raise RuntimeError("Unknown block id type")
+            d['job_id'] = self.blocks.get(bid, None)
+            d['block_id'] = bid
             msg.append(d)
         return msg
 
-    def scale_out(self, blocks=1) -> List[object]:
+    def scale_out(self, blocks=1) -> List[str]:
         """Scales out the number of blocks by "blocks"
         """
         if not self.provider:
-            raise ScalingFailed("none", "No execution provider available")
-        r = []  # type: List[object]
+            raise (ScalingFailed(self.label, "No execution provider available"))
+        block_ids = []  # type: List[str]
         for i in range(blocks):
-            external_block_id = str(len(self.blocks))
+            block_id = str(len(self.blocks))
             try:
-                internal_block_id = self._launch_block(external_block_id)
-                self.blocks[external_block_id] = internal_block_id
-                self.block_mapping[internal_block_id] = external_block_id
-                r.append(external_block_id)
+                job_id = self._launch_block(block_id)
+                self.blocks[block_id] = job_id
+                self.block_mapping[job_id] = block_id
+                block_ids.append(block_id)
             except Exception as ex:
-                self._fail_job_async(external_block_id,
-                                     "Failed to start block {}: {}".format(external_block_id, ex))
-        return r
+                self._fail_job_async(block_id,
+                                     "Failed to start block {}: {}".format(block_id, ex))
+        return block_ids
 
-    def _launch_block(self, external_block_id: str) -> Any:
+    def _launch_block(self, block_id: str) -> Any:
         if self.launch_cmd is None:
             raise ScalingFailed(self.provider.label, "No launch command")
-        launch_cmd = self.launch_cmd.format(block_id=external_block_id)
-        internal_block = self.provider.submit(launch_cmd, 1)
-        logger.debug("Launched block {}->{}".format(external_block_id, internal_block))
-        if not internal_block:
+        launch_cmd = self.launch_cmd.format(block_id=block_id)
+        job_id = self.provider.submit(launch_cmd, 1)
+        logger.debug("Launched block {}->{}".format(block_id, job_id))
+        if not job_id:
             raise(ScalingFailed(self.provider.label,
                                 "Attempts to provision nodes via provider has failed"))
-        return internal_block
+        return job_id
 
-    def scale_in(self, blocks: Optional[int] = None, block_ids: List[str] = [], force: bool = True, max_idletime: Optional[float] = None) -> List[object]:
+    def scale_in(self, blocks: Optional[int] = None, block_ids: List[str] = [], force: bool = True, max_idletime: Optional[float] = None) -> List[str]:
         """Scale in the number of active blocks by specified amount.
 
         The scale in method here is very rude. It doesn't give the workers
@@ -715,16 +707,26 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
 
         # Now kill via provider
         # Potential issue with multiple threads trying to remove the same blocks
-        to_kill = [self.blocks.pop(bid) for bid in block_ids_to_kill if bid in self.blocks]
-        for bid in to_kill:
-            self.removed_block_mapping[bid] = self.block_mapping.pop(bid)
+        to_kill = [self.blocks[bid] for bid in block_ids_to_kill if bid in self.blocks]
 
         r = self.provider.cancel(to_kill)
+        job_ids = self._filter_scale_in_ids(to_kill, r)
 
-        return self._filter_scale_in_ids(to_kill, r)
+        # to_kill block_ids are fetched from self.blocks
+        # If a block_id is in self.block, it must exist in self.block_mapping
+        block_ids_killed = [self.block_mapping[jid] for jid in job_ids]
 
-    def _get_job_ids(self) -> List[object]:
-        return list(self.blocks.values())
+        return block_ids_killed
+
+    def _get_block_and_job_ids(self) -> Tuple[List[str], List[Any]]:
+        # Not using self.blocks.keys() and self.blocks.values() simultaneously
+        # The dictionary may be changed during invoking this function
+        # As scale_in and scale_out are invoked in multiple threads
+        block_ids = list(self.blocks.keys())
+        job_ids = []  # types: List[Any]
+        for bid in block_ids:
+            job_ids.append(self.blocks[bid])
+        return block_ids, job_ids
 
     def shutdown(self, hub: bool = True, targets: Union[str, List[int]] = 'all', block: bool = False) -> bool:
         """Shutdown the executor, including all workers and controllers.
