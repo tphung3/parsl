@@ -92,7 +92,8 @@ def python_app(function=None,
                data_flow_kernel: Optional[DataFlowKernel] = None,
                cache: bool = False,
                executors: Union[List[str], Literal['all']] = 'all',
-               ignore_for_cache: Optional[List[str]] = None):
+               ignore_for_cache: Optional[List[str]] = None,
+               join: bool = False):
     """Decorator function for making python apps.
 
     Parameters
@@ -109,6 +110,10 @@ def python_app(function=None,
         Labels of the executors that this app can execute over. Default is 'all'.
     cache : bool
         Enable caching of the app call. Default is False.
+    join : bool
+        If True, this app will be a join app: the decorated python code must return a Future
+        (rather than a regular value), and and the corresponding AppFuture will complete when
+        that inner future completes.
     """
     from parsl.app.python import PythonApp
 
@@ -118,11 +123,24 @@ def python_app(function=None,
                              data_flow_kernel=data_flow_kernel,
                              cache=cache,
                              executors=executors,
-                             ignore_for_cache=ignore_for_cache)
+                             ignore_for_cache=ignore_for_cache,
+                             join=join)
         return wrapper(func)
     if function is not None:
         return decorator(function)
     return decorator
+
+
+def join_app(function=None,
+             data_flow_kernel: Optional[DataFlowKernel] = None,
+             cache: bool = False,
+             ignore_for_cache: Optional[List[str]] = None):
+    return python_app(function=function,
+                      data_flow_kernel=data_flow_kernel,
+                      cache=cache,
+                      ignore_for_cache=ignore_for_cache,
+                      join=True,
+                      executors=["_parsl_internal"])
 
 
 @typeguard.typechecked

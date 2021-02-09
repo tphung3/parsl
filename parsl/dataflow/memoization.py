@@ -14,6 +14,7 @@ from concurrent.futures import Future
 
 from parsl.serialize import serialize
 import types
+from concurrent.futures import Future
 
 logger = logging.getLogger(__name__)
 
@@ -247,6 +248,8 @@ class Memoizer(object):
             logger.info("Task %s had no result in cache", task_id)
 
         task['hashsum'] = hashsum
+
+        assert isinstance(result, Future) or result is None
         return result
 
     def hash_lookup(self, hashsum: str) -> 'Future[Any]':
@@ -274,6 +277,8 @@ class Memoizer(object):
         A warning is issued when a hash collision occurs during the update.
         This is not likely.
         """
+        # TODO: could use typeguard
+        assert isinstance(r, Future)
         if not self.memoize or not task['memoize'] or 'hashsum' not in task:
             return
 
