@@ -131,6 +131,7 @@ def python_app(function=None,
     return decorator
 
 
+@typeguard.typechecked
 def join_app(function=None,
              data_flow_kernel: Optional[DataFlowKernel] = None,
              cache: bool = False,
