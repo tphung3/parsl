@@ -14,7 +14,6 @@ from concurrent.futures import Future
 
 from parsl.serialize import serialize
 import types
-from concurrent.futures import Future
 
 logger = logging.getLogger(__name__)
 

@@ -438,7 +438,7 @@ class DataFlowKernel(object):
             self.wipe_task(task_id)
         return
 
-    def _complete_task(self, task_record, new_state, result):
+    def _complete_task(self, task_record: TaskRecord, new_state: States, result: Any) -> None:
         """Set a task into a completed state
         """
         assert new_state in FINAL_STATES

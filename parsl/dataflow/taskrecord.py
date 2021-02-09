@@ -50,3 +50,6 @@ class TaskRecord(TypedDict, total=False):
     try_id: int
 
     resource_specification: Dict[str, Any]
+
+    join: bool
+    joins: Optional[Future]
