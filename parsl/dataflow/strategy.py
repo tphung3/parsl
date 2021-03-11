@@ -351,6 +351,7 @@ class Strategy(object):
                 elif strategy_type == 'simple':
                     # skip for simple strategy
                     pass
+                # TODO how does this elif^ differ from the default case of doing nothing in the implicit missing `else` ? I don't think it does...
 
             # Case 3
             # tasks ~ slots
