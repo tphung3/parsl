@@ -51,7 +51,7 @@ class PollItem(ExecutorStatus):
             self._last_poll_time = now
             self.send_monitoring_info(self._status)
 
-    # status: isn't optional so shoudln't default to None. I think?
+    # status: isn't optional so shouldn't default to None. I think?
     # can I make the dict type more specific?
     def send_monitoring_info(self, status: Dict) -> None:
         # Send monitoring info for HTEX when monitoring enabled
