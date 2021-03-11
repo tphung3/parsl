@@ -611,7 +611,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
         """Scales out the number of blocks by "blocks"
         """
         if not self.provider:
-            raise (ScalingFailed(None, "No execution provider available"))
+            raise ScalingFailed(None, "No execution provider available")
         block_ids = []  # type: List[str]
         for i in range(blocks):
             block_id = str(len(self.blocks))

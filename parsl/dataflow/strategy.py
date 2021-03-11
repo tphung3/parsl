@@ -329,12 +329,12 @@ class Strategy(object):
                     excess = math.ceil((active_tasks * parallelism) - active_slots)
                     excess_blocks = math.ceil(float(excess) / (tasks_per_node * nodes_per_block))
                     excess_blocks = min(excess_blocks, max_blocks - active_blocks)
-                    logger.debug("Requesting {} more blocks".format(excess_blocks))
+                    logger.debug("BENC: strategy: Requesting {} more blocks".format(excess_blocks))
                     exec_status.scale_out(excess_blocks)
 
             elif active_slots == 0 and active_tasks > 0:
                 # Case 4
-                logger.debug("Requesting single slot")
+                logger.debug("BENC: strategy: Requesting single slot")
                 if active_blocks < max_blocks:
                     exec_status.scale_out(1)
 

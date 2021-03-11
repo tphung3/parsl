@@ -91,13 +91,20 @@ class PollItem(ExecutorStatus):
         return block_ids
 
     def scale_out(self, n: int) -> List[str]:
+        logger.debug("BENC: in task status scale out")
         block_ids = self._executor.scale_out(n)
+        logger.debug("BENC: executor scale out has returned")
+
         if block_ids is not None:
+            logger.debug(f"BENC: there were some block ids, {block_ids}, which will now be set to pending")
             new_status = {}
             for block_id in block_ids:
                 new_status[block_id] = JobStatus(JobState.PENDING)
             self.send_monitoring_info(new_status)
             self._status.update(new_status)
+        # else:
+            # mypy declares this as unreachable...
+            # logger.debug("BENC: there were no block IDs returned from the scale out call")
         return block_ids
 
     def __repr__(self) -> str:
