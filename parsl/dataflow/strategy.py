@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 from parsl.executors.base import ParslExecutor, HasConnectedWorkers
 
 from typing import Dict
-from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Sequence
+from typing_extensions import TypedDict
 
 # this is used for testing a class to decide how to
 # print a status line. That might be better done inside
@@ -33,6 +33,10 @@ from parsl.executors import HighThroughputExecutor, ExtremeScaleExecutor
 from parsl.providers.provider_base import JobState
 
 logger = logging.getLogger(__name__)
+
+
+class ExecutorIdleness(TypedDict):
+    idle_since: Optional[float]
 
 
 class Strategy(object):
@@ -135,7 +139,8 @@ class Strategy(object):
         """Initialize strategy."""
         self.dfk = dfk
         self.config = dfk.config
-        self.executors = {}  # type: Dict[str, Dict[str, Any]]
+        self.executors = {}  # type: Dict[str, ExecutorIdleness]
+        # self.executors = {}  # type: Dict[str, Dict[str, Any]]
         self.max_idletime = self.dfk.config.max_idletime
 
         for e in self.dfk.config.executors:
@@ -281,8 +286,15 @@ class Strategy(object):
                         )
                         self.executors[executor.label]['idle_since'] = time.time()
 
+                    # ... this could be None, type-wise. So why aren't we seeing errors here?
+                    # probably becaues usually if this is None, it will be because active_tasks>0,
+                    # (although I can't see a clear proof that this will always be the case:
+                    # could that setting to None have happened on a previous iteration?)
+
+                    # if idle_since is None, then that means not idle, which means should not
+                    # go down the scale_in path
                     idle_since = self.executors[executor.label]['idle_since']
-                    if (time.time() - idle_since) > self.max_idletime:
+                    if idle_since is not None and (time.time() - idle_since) > self.max_idletime:
                         # We have resources idle for the max duration,
                         # we have to scale_in now.
                         logger.debug("Idle time has reached {}s for executor {}; removing resources".format(
