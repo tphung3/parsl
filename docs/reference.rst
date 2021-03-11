@@ -134,6 +134,7 @@ Exceptions
     parsl.app.errors.BashExitFailure
     parsl.app.errors.MissingOutputs
     parsl.app.errors.ParslError
+    parsl.errors.OptionalModuleMissing
     parsl.executors.errors.ExecutorError
     parsl.executors.errors.ScalingFailed
     parsl.executors.errors.SerializationError
@@ -146,7 +147,6 @@ Exceptions
     parsl.dataflow.error.DependencyError
     parsl.launchers.error.BadLauncher
     parsl.providers.error.ExecutionProviderException
-    parsl.providers.error.OptionalModuleMissing
     parsl.providers.error.ChannelRequired
     parsl.providers.error.ScaleOutFailed
     parsl.providers.error.SchedulerMissingArgs

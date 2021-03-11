@@ -161,7 +161,7 @@ class Strategy(object):
         for executor in executors:
             self.executors[executor.label] = {'idle_since': None, 'config': executor.label}
 
-    def _strategy_noop(self, status: List[ExecutorStatus], tasks: List[int], kind: Optional[str] = None) -> None:
+    def _strategy_noop(self, status: List[ExecutorStatus], tasks: List[int]) -> None:
         """Do nothing.
 
         Args:
@@ -182,14 +182,11 @@ class Strategy(object):
 
         self.logger_flag = True
 
-    def _strategy_simple(self, status_list: "List[PollItem]", tasks: List[int], kind: Optional[str] = None) -> None:
-        self._general_strategy(status_list, tasks, strategy_type='simple', kind=None)
+    def _strategy_simple(self, status_list: "List[PollItem]", tasks: List[int]) -> None:
+        self._general_strategy(status_list, tasks, strategy_type='simple')
 
-    def _strategy_htex_auto_scale(self, status_list: "List[PollItem]", tasks: List[int], kind: Optional[str] = None) -> None:
-        self._general_strategy(status_list, tasks, strategy_type='htex', kind=None)
-
-    def _general_strategy(self, status_list: "List[PollItem]", tasks: List[int], strategy_type: str, kind: Optional[str] = None) -> None:
-        """ HTEX specific auto scaling strategy
+    def _strategy_htex_auto_scale(self, status_list: "List[PollItem]", tasks: List[int]) -> None:
+        """HTEX specific auto scaling strategy
 
         This strategy works only for HTEX. This strategy will scale up by
         requesting additional compute resources via the provider when the
@@ -206,6 +203,9 @@ class Strategy(object):
         Args:
             - tasks (task_ids): Not used here.
         """
+        self._general_strategy(status_list, tasks, strategy_type='htex')
+
+    def _general_strategy(self, status_list: "List[PollItem]", tasks: List[int], strategy_type: str) -> None:
         for exec_status in status_list:
             executor = exec_status.executor
             label = executor.label

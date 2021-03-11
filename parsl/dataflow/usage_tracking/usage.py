@@ -12,7 +12,6 @@ import multiprocessing as mp
 
 from typing import List
 
-from parsl.dataflow.states import FINAL_FAILURE_STATES
 from parsl.version import VERSION as PARSL_VERSION
 
 logger = logging.getLogger(__name__)
@@ -181,8 +180,7 @@ class UsageTracker (object):
 
         site_count = len([x for x in self.dfk.config.executors if x.managed])
 
-        app_fails = len([t for t in self.dfk.tasks if
-                         self.dfk.tasks[t]['status'] in FINAL_FAILURE_STATES])
+        app_fails = self.dfk.tasks_failed_count + self.dfk.tasks_dep_fail_count
 
         message = {'uuid': self.uuid,
                    'end': time.time(),
