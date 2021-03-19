@@ -15,7 +15,13 @@ from typing import Any, Dict, List, Tuple, Optional
 
 class NoAuthSSHClient(paramiko.SSHClient):
     def _auth(self, username: str, *args: List[Any]) -> None:
-        self._transport.auth_none(username)
+        # swapped _internal variable for get_transport accessor
+        # method that I'm assuming without checking does the
+        # same thing.
+        transport = self.get_transport()
+        if transport is None:
+            raise RuntimeError("Expected a transport to be available")
+        transport.auth_none(username)
 
 
 class SSHChannel(Channel, RepresentationMixin):
@@ -79,12 +85,12 @@ class SSHChannel(Channel, RepresentationMixin):
         self.host_keys_filename = host_keys_filename
 
         if self.skip_auth:
-            self.ssh_client = NoAuthSSHClient()
+            self.ssh_client: paramiko.SSHClient = NoAuthSSHClient()
         else:
             self.ssh_client = paramiko.SSHClient()
         self.ssh_client.load_system_host_keys(filename=host_keys_filename)
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.sftp_client = None
+        self.sftp_client: Optional[paramiko.SFTPClient] = None
 
         self.envs = {}  # type: Dict[str, str]
         if envs is not None:
@@ -92,7 +98,7 @@ class SSHChannel(Channel, RepresentationMixin):
 
     def _is_connected(self) -> bool:
         transport = self.ssh_client.get_transport() if self.ssh_client else None
-        return transport and transport.is_active()
+        return bool(transport and transport.is_active())
 
     def _connect(self) -> None:
         if not self._is_connected():
@@ -109,6 +115,8 @@ class SSHChannel(Channel, RepresentationMixin):
                     key_filename=self.key_filename
                 )
                 transport = self.ssh_client.get_transport()
+                if not transport:
+                    raise RuntimeError("SSH client transport is None, despite connecting")
                 self.sftp_client = paramiko.SFTPClient.from_transport(transport)
 
             except paramiko.BadHostKeyException as e:
@@ -125,6 +133,8 @@ class SSHChannel(Channel, RepresentationMixin):
 
     def _valid_sftp_client(self) -> paramiko.SFTPClient:
         self._connect()
+        if self.sftp_client is None:
+            raise RuntimeError("Internal consistency error: self.sftp_client should be valid but is not")
         return self.sftp_client
 
     def _valid_ssh_client(self) -> paramiko.SSHClient:
@@ -241,7 +251,7 @@ class SSHChannel(Channel, RepresentationMixin):
 
     def close(self) -> bool:
         if self._is_connected():
-            return self.ssh_client.close()
+            self.ssh_client.close()
         return True
 
     def isdir(self, path: str) -> bool:
