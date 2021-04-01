@@ -6,6 +6,10 @@ import logging
 import typeguard
 from abc import ABCMeta, abstractmethod
 from inspect import signature
+from typing import List, Optional, Union
+from typing_extensions import Literal
+
+from parsl.dataflow.dflow import DataFlowKernel
 
 from typing import TYPE_CHECKING
 from typing import Optional
