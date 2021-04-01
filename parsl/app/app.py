@@ -12,17 +12,12 @@ from typing_extensions import Literal
 from parsl.dataflow.dflow import DataFlowKernel
 
 from typing import TYPE_CHECKING
-from typing import Optional
-from typing import Union
-from typing import List
 from typing import Callable
-from typing_extensions import Literal
 
 if TYPE_CHECKING:
     from typing import Dict
     from typing import Any
 
-from parsl.dataflow.dflow import DataFlowKernel
 from parsl.dataflow.futures import AppFuture
 
 
