@@ -180,9 +180,6 @@ class Memoizer(object):
     def make_hash(self, task: TaskRecord) -> str:
         """Create a hash of the task inputs.
 
-        If this fails here, then all ipp calls are also likely to fail due to failure
-        at serialization.
-
         Args:
             - task (dict) : Task dictionary from dfk.tasks
 
