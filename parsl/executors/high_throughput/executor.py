@@ -570,7 +570,7 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
             args_to_print = tuple([arg if len(repr(arg)) < 100 else (repr(arg)[:100] + '...') for arg in args])
         logger.debug("Pushing function {} to queue with args {}".format(func, args_to_print))
 
-        fut = Future()
+        fut: Future = Future()
         self.tasks[task_id] = fut
 
         try:
