@@ -28,7 +28,6 @@ from typing_extensions import TypedDict
 
 
 from parsl.dataflow.executor_status import ExecutorStatus
-
 from parsl.executors import HighThroughputExecutor
 from parsl.providers.provider_base import JobState
 
@@ -227,18 +226,7 @@ class Strategy(object):
             # FIXME probably more of this logic should be moved to the provider
             min_blocks = executor.provider.min_blocks
             max_blocks = executor.provider.max_blocks
-
-            # TODO: this should be related to the HasConnectedWorkers protocol
-            # rather than a hard-coded whitelist of executors.
-            if isinstance(executor, HighThroughputExecutor):
-                tasks_per_node = executor.workers_per_node
-
-            # this code will never fire... because ExtremeScaleExecutor is a subclass of the above matched HighThroughputExecutor
-            # elif isinstance(executor, ExtremeScaleExecutor):
-            #    tasks_per_node = executor.ranks_per_node
-
-            else:
-                assert(RuntimeError("BENC: missing else statement in executor case matching"))
+            tasks_per_node = executor.workers_per_node
 
             nodes_per_block = executor.provider.nodes_per_block
             parallelism = executor.provider.parallelism
