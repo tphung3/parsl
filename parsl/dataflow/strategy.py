@@ -226,7 +226,6 @@ class Strategy(object):
             # FIXME probably more of this logic should be moved to the provider
             min_blocks = executor.provider.min_blocks
             max_blocks = executor.provider.max_blocks
-            tasks_per_node = executor.workers_per_node
 
             nodes_per_block = executor.provider.nodes_per_block
             parallelism = executor.provider.parallelism
@@ -234,21 +233,15 @@ class Strategy(object):
             running = sum([1 for x in status.values() if x.state == JobState.RUNNING])
             pending = sum([1 for x in status.values() if x.state == JobState.PENDING])
             active_blocks = running + pending
-            active_slots = active_blocks * tasks_per_node * nodes_per_block
+
+            # TODO: if this isinstance doesn't fire, tasks_per_node and active_slots won't be
+            # set this iteration and either will be unset or will contain a previous executor's value.
+            # in both cases, this is wrong. but apparently mypy doesn't notice.
 
             if isinstance(executor, HasConnectedWorkers):
+                tasks_per_node = executor.workers_per_node
 
-                # mypy is not able to infer that executor has a
-                # .connected_workers attribute from the above if statement,
-                # so to make it happy, detyped_executor is turned into an
-                # Any, which can have anything called on it. This makes this
-                # code block less type safe.
-                # A better approach would be for connected_workers to be
-                # in a protocol, perhaps? or something else we can
-                # meaningfully check in mypy. or have the executor able to
-                # print its own statistics status rather than any ad-hoc
-                # behaviour change here.
-                # mypy issue https://github.com/python/mypy/issues/1424
+                active_slots = active_blocks * tasks_per_node * nodes_per_block
 
                 logger.debug('Executor {} has {} active tasks, {}/{} running/pending blocks, and {} connected workers'.format(
                     label, active_tasks, running, pending, executor.connected_workers))

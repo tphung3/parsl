@@ -271,3 +271,4 @@ class ParslExecutor(metaclass=ABCMeta):
 class HasConnectedWorkers():
     """A marker type to indicate that the executor has a count of connected workers"""
     connected_workers: int
+    workers_per_node: float
