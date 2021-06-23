@@ -18,6 +18,9 @@ class ParslExecutor(metaclass=ABCMeta):
     This is a metaclass that only enforces concrete implementations of
     functionality by the child classes.
 
+    Can be used as a context manager. On exit, calls ``self.shutdown()`` with
+    no arguments and re-raises any thrown exception.
+
     In addition to the listed methods, a ParslExecutor instance must always
     have a member field:
 
@@ -44,6 +47,13 @@ class ParslExecutor(metaclass=ABCMeta):
     working_dir: Optional[str]
     storage_access: Optional[Sequence[Staging]]
     run_id: Optional[str]
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.shutdown()
+        return False
 
     @abstractmethod
     def start(self) -> Optional[List[str]]:
