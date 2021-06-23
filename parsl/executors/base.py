@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from concurrent.futures import Future
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, List, Literal, Optional, Sequence
 
 from parsl.data_provider.staging import Staging
 
@@ -48,10 +48,11 @@ class ParslExecutor(metaclass=ABCMeta):
     storage_access: Optional[Sequence[Staging]]
     run_id: Optional[str]
 
-    def __enter__(self):
+    def __enter__(self) -> "ParslExecutor":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    # too lazy to figure out what the three Anys here should be
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> Literal[False]:
         self.shutdown()
         return False
 
