@@ -433,12 +433,6 @@ class HighThroughputExecutor(StatusHandlingExecutor, RepresentationMixin, HasCon
                 break
         logger.info("[MTHREAD] queue management worker finished")
 
-    # When the executor gets lost, the weakref callback will wake up
-    # the queue management thread.
-    def weakref_cb(self, q=None) -> None:
-        """We do not use this yet."""
-        q.put(None)
-
     def _start_local_queue_process(self) -> None:
         """ Starts the interchange process locally
 
