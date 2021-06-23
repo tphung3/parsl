@@ -297,8 +297,3 @@ class LocalProvider(ExecutionProvider, RepresentationMixin, Channeled):
     @property
     def status_polling_interval(self):
         return 5
-
-
-if __name__ == "__main__":
-
-    print("Nothing here")
