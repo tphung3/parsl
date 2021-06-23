@@ -425,7 +425,7 @@ class DataFlowKernel(object):
         It will trigger post-app processing such as checkpointing.
 
         Args:
-             task_id (int) : Task id  [TODO: update master docs - not an int]
+             task_record : Task record
              future (Future) : The relevant app future (which should be
                  consistent with the task structure 'app_fu' entry
 
