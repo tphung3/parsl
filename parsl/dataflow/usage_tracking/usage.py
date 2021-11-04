@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def async_process(fn):
     """ Decorator function to launch a function as a separate process """
 
-    def run(*args, **kwargs) -> mp.Process:
+    def run(*args, **kwargs) -> ForkProcess:
         proc = ForkProcess(target=fn, args=args, kwargs=kwargs, name="Usage-Tracking")
         proc.start()
         return proc
@@ -115,7 +115,7 @@ class UsageTracker (object):
         self.sock_timeout = 5
         self.UDP_PORT = port
         self.UDP_IP = None
-        self.procs = []  # type: List[mp.Process]
+        self.procs = []  # type: List[ForkProcess]
         self.dfk = dfk
         self.config = self.dfk.config
         self.uuid = str(uuid.uuid4())
