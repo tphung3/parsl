@@ -722,24 +722,27 @@ class DataFlowKernel(object):
     def sanitize_and_wrap(self,
                           args: Sequence[Any],
                           kwargs: Dict[str, Any]) -> Tuple[Sequence[Any], Dict[str, Any], Sequence[Tuple[Exception, str]]]:
-        """This function should be called only when all the futures we track have been resolved.
+        """This function should be called when all dependencies have completed.
+
+        It will rewrite the arguments for that task, replacing each Future
+        with the result of that future.
 
         If the user hid futures a level below, we will not catch
         it, and will (most likely) result in a type error.
 
         Args:
-             func (Function) : App function
              args (List) : Positional args to app function
              kwargs (Dict) : Kwargs to app function
 
         Return:
-             partial function evaluated with all dependencies in  args, kwargs and kwargs['inputs'] evaluated.
-
+            a rewritten args list
+            a rewritten kwargs dict
+            pairs of exceptions, task ids from any Futures which stored
+            exceptions rather than results.
 
         TODO: mypy note: we take a *tuple* of args but return a *list* of args.
         That's an (unintentional?) change of type of arg structure which leads me
         to try to represent the args in TaskRecord as a Sequence
-
         """
         dep_failures = []
 
