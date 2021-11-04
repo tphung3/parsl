@@ -24,15 +24,9 @@ from parsl.app.errors import RemoteExceptionWrapper
 from parsl.executors.high_throughput.errors import WorkerLost
 from parsl.executors.high_throughput.probe import probe_addresses
 
-# MYPY: flipped this so that mpQueue gets a type Type[Queue], rather than Type[mac_safe_queue]
-# This means that both imports satisfy that type annotation, as mac_safe_queue is a subclass
-# of multiprocessing.Queue, but not vice-versa.
-if platform.system() != 'Darwin':
-    from multiprocessing import Queue as mpQueue
-    from multiprocessing import Process as mpProcess
-else:
-    from parsl.executors.high_throughput.mac_safe_queue import MacSafeQueue as mpQueue
-    from parsl.executors.high_throughput.mac_safe_process import MacSafeProcess as mpProcess
+from parsl.multiprocessing import ForkProcess as mpProcess
+
+from parsl.multiprocessing import SizedQueue as mpQueue
 
 from parsl.serialize import unpack_apply_message, serialize
 

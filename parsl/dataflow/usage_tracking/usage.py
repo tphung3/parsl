@@ -8,10 +8,10 @@ import logging
 import socket
 import sys
 import platform
-import multiprocessing as mp
 
 from typing import List
 
+from parsl.multiprocessing import ForkProcess
 from parsl.version import VERSION as PARSL_VERSION
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ def async_process(fn):
     """ Decorator function to launch a function as a separate process """
 
     def run(*args, **kwargs) -> mp.Process:
-        proc = mp.Process(target=fn, args=args, kwargs=kwargs, name="Usage-Tracking")
+        proc = ForkProcess(target=fn, args=args, kwargs=kwargs, name="Usage-Tracking")
         proc.start()
         return proc
 
