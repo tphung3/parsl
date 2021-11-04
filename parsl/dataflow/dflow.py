@@ -223,6 +223,7 @@ class DataFlowKernel(object):
         task_log_info["task_memoize"] = task_record['memoize']
         task_log_info["task_hashsum"] = task_record['hashsum']
         task_log_info["task_fail_count"] = task_record['fail_count']
+        task_log_info["task_fail_cost"] = task_record['fail_cost']
         task_log_info["task_status"] = task_record['status']
         task_log_info["task_id"] = task_record['id']
         task_log_info["task_time_invoked"] = task_record['time_invoked']
@@ -235,7 +236,6 @@ class DataFlowKernel(object):
         task_log_info['timestamp'] = datetime.datetime.now()
         task_log_info['task_status_name'] = task_record['status'].name
         task_log_info['tasks_failed_count'] = self.tasks_failed_count
-        task_log_info['tasks_failed_cost'] = self.tasks_failed_cost
         task_log_info['tasks_completed_count'] = self.tasks_completed_count
         task_log_info['tasks_memo_completed_count'] = self.tasks_memo_completed_count
         task_log_info['from_memo'] = task_record['from_memo']
