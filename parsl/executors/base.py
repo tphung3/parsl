@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from concurrent.futures import Future
-from typing import Any, Callable, Dict, List, Literal, Optional, Sequence
+from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Union
 
 from parsl.data_provider.staging import Staging
 
@@ -278,6 +278,9 @@ class ParslExecutor(metaclass=ABCMeta):
 
 
 class HasConnectedWorkers():
-    """A marker type to indicate that the executor has a count of connected workers"""
+    """A marker type to indicate that the executor has a count of connected workers. This maybe should merge into the block executor?"""
     connected_workers: int
-    workers_per_node: float
+
+    @abstractproperty
+    def workers_per_node(self) -> Union[int, float]:
+        pass
