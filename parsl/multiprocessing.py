@@ -10,9 +10,17 @@ from typing import Callable, Type
 
 logger = logging.getLogger(__name__)
 
-# maybe ForkProcess should be: Callable[..., Process] so as to make
-# it clear that it returns a Process always to the type checker?
-ForkProcess: Type = multiprocessing.get_context('fork').Process
+ForkProcess = multiprocessing.context.ForkProcess
+
+def forkProcess(*args, **kwargs) -> ForkProcess:
+    P = multiprocessing.get_context('fork').Process
+    # reveal_type(P)
+    return P(*args, **kwargs)
+
+# ForkProcess = multiprocessing.context.ForkProcess
+#ForkProcess = multiprocessing.get_context('fork').Process
+
+# ForkProcess: Type[multiprocessing.context.ForkProcess] = multiprocessing.get_context('fork').Process
 
 
 class MacSafeQueue(multiprocessing.queues.Queue):

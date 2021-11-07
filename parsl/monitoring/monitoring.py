@@ -8,7 +8,7 @@ import datetime
 import zmq
 
 import queue
-from parsl.multiprocessing import ForkProcess, SizedQueue
+from parsl.multiprocessing import forkProcess, SizedQueue, ForkProcess
 from multiprocessing import Process, Queue
 from parsl.utils import RepresentationMixin
 from parsl.process_loggers import wrap_with_logs
@@ -326,10 +326,10 @@ class MonitoringHub(RepresentationMixin):
                                monitoring_hub_url,
                                run_id)
 
-            p: Optional[Process]
+            p: Optional[ForkProcess]
             if monitor_resources:
                 # create the monitor process and start
-                pp = ForkProcess(target=monitor,
+                p = forkProcess(target=monitor,
                                  args=(os.getpid(),
                                        try_id,
                                        task_id,
@@ -338,8 +338,8 @@ class MonitoringHub(RepresentationMixin):
                                        logging_level,
                                        sleep_dur),
                                  name="Monitor-Wrapper-{}".format(task_id))
-                pp.start()
-                p = pp
+                p.start()
+                # p = pp
                 #  TODO: awkwardness because ForkProcess is not directly a constructor
                 # and type-checking is expecting p to be optional and cannot
                 # narrow down the type of p in this block.

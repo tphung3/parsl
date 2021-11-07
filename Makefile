@@ -46,6 +46,7 @@ clean_coverage:
 
 .PHONY: mypy
 mypy: ## run mypy checks
+	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/multiprocessing.py
 	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/configs/
 	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/sites/
 	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/
