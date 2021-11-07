@@ -70,23 +70,7 @@ class LocalChannel(Channel, RepresentationMixin):
                 shell=True,
                 preexec_fn=os.setpgrp
             )
-            proc.wait(timeout=walltime)
-            # BENC: for type purposes, stdout and stderr might be None,
-            # even though in this case, I'd hope that they'd be
-            # pipes because of subprocess.PIPE above...
-
-            stdout_stream = proc.stdout
-            if stdout_stream:
-                stdout = stdout_stream.read()
-            else:
-                raise RuntimeError("stdout unreadable")
-
-            stderr_stream = proc.stderr
-            if stderr_stream:
-                stderr = stderr_stream.read()
-            else:
-                raise RuntimeError("stderr unreadable")
-
+            (stdout, stderr) = proc.communicate(timeout=walltime)
             retcode = proc.returncode
 
         except Exception as e:
