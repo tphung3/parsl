@@ -56,11 +56,11 @@ class MacSafeQueue(multiprocessing.queues.Queue):
 # SizedQueue should be constructable using the same calling
 # convention as multiprocessing.Queue but that entire signature
 # isn't expressible in mypy 0.790
-SizedQueue: Callable[..., multiprocessing.Queue]
+# SizedQueue: Callable[..., multiprocessing.Queue]
 
+def sizedQueue(*args, **kwargs) -> multiprocessing.queues.Queue:
+    if platform.system() != 'Darwin':
+        return multiprocessing.Queue(*args, **kwargs)
+    else:
+        return MacSafeQueue(*args, **kwargs)
 
-if platform.system() != 'Darwin':
-    import multiprocessing
-    SizedQueue = multiprocessing.Queue
-else:
-    SizedQueue = MacSafeQueue

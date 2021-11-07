@@ -27,7 +27,7 @@ from parsl.data_provider.staging import Staging
 from parsl.addresses import get_all_addresses
 from parsl.process_loggers import wrap_with_logs
 
-from parsl.multiprocessing import ForkProcess
+from parsl.multiprocessing import forkProcess, ForkProcess
 from parsl.utils import RepresentationMixin
 from parsl.providers import LocalProvider
 
@@ -441,7 +441,7 @@ class HighThroughputExecutor(BlockProviderExecutor, RepresentationMixin, HasConn
         get the worker task and result ports that the interchange has bound to.
         """
         comm_q = Queue(maxsize=10)  # type: Queue[Any]
-        self.queue_proc = ForkProcess(target=interchange.starter,
+        self.queue_proc = forkProcess(target=interchange.starter,
                                       args=(comm_q,),
                                       kwargs={"client_ports": (self.outgoing_q.port,
                                                                self.incoming_q.port,

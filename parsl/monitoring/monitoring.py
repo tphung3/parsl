@@ -8,7 +8,7 @@ import datetime
 import zmq
 
 import queue
-from parsl.multiprocessing import forkProcess, SizedQueue, ForkProcess
+from parsl.multiprocessing import forkProcess, sizedQueue, ForkProcess
 from multiprocessing import Process, Queue
 from parsl.utils import RepresentationMixin
 from parsl.process_loggers import wrap_with_logs
@@ -221,14 +221,14 @@ class MonitoringHub(RepresentationMixin):
                                                               min_port=self.client_port_range[0],
                                                               max_port=self.client_port_range[1])
 
-        comm_q = SizedQueue(maxsize=10)  # type: Queue[Union[Tuple[int, int], str]]
-        self.exception_q = SizedQueue(maxsize=10)  # type: Queue[Tuple[str, str]]
-        self.priority_msgs = SizedQueue()  # type: Queue[Tuple[Any, int]]
-        self.resource_msgs = SizedQueue()  # type: Queue[Tuple[Tuple[MessageType, Dict[str, Any]], Any]]
-        self.node_msgs = SizedQueue()  # type: Queue[Tuple[Tuple[MessageType, Dict[str, Any]], int]]
-        self.block_msgs = SizedQueue()  # type:  Queue[Tuple[Tuple[MessageType, Dict[str, Any]], Any]]
+        comm_q = sizedQueue(maxsize=10)  # type: Queue[Union[Tuple[int, int], str]]
+        self.exception_q = sizedQueue(maxsize=10)  # type: Queue[Tuple[str, str]]
+        self.priority_msgs = sizedQueue()  # type: Queue[Tuple[Any, int]]
+        self.resource_msgs = sizedQueue()  # type: Queue[Tuple[Tuple[MessageType, Dict[str, Any]], Any]]
+        self.node_msgs = sizedQueue()  # type: Queue[Tuple[Tuple[MessageType, Dict[str, Any]], int]]
+        self.block_msgs = sizedQueue()  # type:  Queue[Tuple[Tuple[MessageType, Dict[str, Any]], Any]]
 
-        self.router_proc = ForkProcess(target=router_starter,
+        self.router_proc = forkProcess(target=router_starter,
                                        args=(comm_q, self.exception_q, self.priority_msgs, self.node_msgs, self.block_msgs, self.resource_msgs),
                                        kwargs={"hub_address": self.hub_address,
                                                "hub_port": self.hub_port,
@@ -244,7 +244,7 @@ class MonitoringHub(RepresentationMixin):
         )
         self.router_proc.start()
 
-        self.dbm_proc = ForkProcess(target=dbm_starter,
+        self.dbm_proc = forkProcess(target=dbm_starter,
                                     args=(self.exception_q, self.priority_msgs, self.node_msgs, self.block_msgs, self.resource_msgs,),
                                     kwargs={"logdir": self.logdir,
                                             "logging_level": logging.DEBUG if self.monitoring_debug else logging.INFO,
@@ -339,10 +339,6 @@ class MonitoringHub(RepresentationMixin):
                                        sleep_dur),
                                  name="Monitor-Wrapper-{}".format(task_id))
                 p.start()
-                # p = pp
-                #  TODO: awkwardness because ForkProcess is not directly a constructor
-                # and type-checking is expecting p to be optional and cannot
-                # narrow down the type of p in this block.
 
             else:
                 p = None

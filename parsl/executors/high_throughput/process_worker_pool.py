@@ -26,7 +26,8 @@ from parsl.executors.high_throughput.probe import probe_addresses
 
 from parsl.multiprocessing import ForkProcess as mpProcess
 
-from parsl.multiprocessing import SizedQueue as mpQueue
+from parsl.multiprocessing import sizedQueue
+from multiprocessing import Queue
 
 from parsl.serialize import unpack_apply_message, serialize
 
@@ -176,9 +177,9 @@ class Manager(object):
                                 math.floor(cores_on_node / cores_per_worker))
         logger.info("Manager will spawn {} workers".format(self.worker_count))
 
-        self.pending_task_queue = mpQueue()  # type: mpQueue[Any]
-        self.pending_result_queue = mpQueue()  # type: mpQueue[Any]
-        self.ready_worker_queue = mpQueue()  # type: mpQueue[Any]
+        self.pending_task_queue = sizedQueue()  # type: Queue[Any]
+        self.pending_result_queue = sizedQueue()  # type: Queue[Any]
+        self.ready_worker_queue = sizedQueue()  # type: Queue[Any]
 
         self.max_queue_size = self.prefetch_capacity + self.worker_count
 
