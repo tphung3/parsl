@@ -17,11 +17,6 @@ def forkProcess(*args, **kwargs) -> ForkProcess:
     # reveal_type(P)
     return P(*args, **kwargs)
 
-# ForkProcess = multiprocessing.context.ForkProcess
-#ForkProcess = multiprocessing.get_context('fork').Process
-
-# ForkProcess: Type[multiprocessing.context.ForkProcess] = multiprocessing.get_context('fork').Process
-
 
 class MacSafeQueue(multiprocessing.queues.Queue):
     """ Multiprocessing queues do not have qsize attributes on MacOS.
