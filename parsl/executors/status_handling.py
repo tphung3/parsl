@@ -159,8 +159,8 @@ class BlockProviderExecutor(ParslExecutor):
         """Scales out the number of blocks by "blocks"
         """
         if not self.provider:
-            raise (ScalingFailed(None, "No execution provider available"))
-        block_ids = []
+            raise ScalingFailed(None, "No execution provider available")
+        block_ids: List[str] = []   # is this true? is a block ID always a string (vs eg a POpen object?)
         for i in range(blocks):
             block_id = str(len(self.blocks))
             try:
@@ -178,8 +178,8 @@ class BlockProviderExecutor(ParslExecutor):
         job_id = self.provider.submit(launch_cmd, 1)
         logger.debug("Launched block {}->{}".format(block_id, job_id))
         if not job_id:
-            raise(ScalingFailed(self.provider.label,
-                                "Attempts to provision nodes via provider has failed"))
+            raise ScalingFailed(self.provider.label,
+                                "Attempts to provision nodes via provider has failed")
         return job_id
 
     @abstractmethod
