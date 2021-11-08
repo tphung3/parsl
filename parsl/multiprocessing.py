@@ -6,11 +6,10 @@ import multiprocessing
 import multiprocessing.queues
 import platform
 
-from typing import Callable, Type
-
 logger = logging.getLogger(__name__)
 
 ForkProcess = multiprocessing.context.ForkProcess
+
 
 def forkProcess(*args, **kwargs) -> ForkProcess:
     P = multiprocessing.get_context('fork').Process
@@ -63,4 +62,3 @@ def sizedQueue(*args, **kwargs) -> multiprocessing.queues.Queue:
         return multiprocessing.Queue(*args, **kwargs)
     else:
         return MacSafeQueue(*args, **kwargs)
-

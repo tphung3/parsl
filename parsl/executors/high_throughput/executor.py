@@ -27,7 +27,7 @@ from parsl.data_provider.staging import Staging
 from parsl.addresses import get_all_addresses
 from parsl.process_loggers import wrap_with_logs
 
-from parsl.multiprocessing import forkProcess, ForkProcess
+from parsl.multiprocessing import forkProcess
 from parsl.utils import RepresentationMixin
 from parsl.providers import LocalProvider
 

@@ -9,7 +9,7 @@ import zmq
 
 import queue
 from parsl.multiprocessing import forkProcess, sizedQueue, ForkProcess
-from multiprocessing import Process, Queue
+from multiprocessing import Queue
 from parsl.utils import RepresentationMixin
 from parsl.process_loggers import wrap_with_logs
 
@@ -330,14 +330,14 @@ class MonitoringHub(RepresentationMixin):
             if monitor_resources:
                 # create the monitor process and start
                 p = forkProcess(target=monitor,
-                                 args=(os.getpid(),
-                                       try_id,
-                                       task_id,
-                                       monitoring_hub_url,
-                                       run_id,
-                                       logging_level,
-                                       sleep_dur),
-                                 name="Monitor-Wrapper-{}".format(task_id))
+                                args=(os.getpid(),
+                                      try_id,
+                                      task_id,
+                                      monitoring_hub_url,
+                                      run_id,
+                                      logging_level,
+                                      sleep_dur),
+                                name="Monitor-Wrapper-{}".format(task_id))
                 p.start()
 
             else:

@@ -11,11 +11,11 @@ import platform
 
 from typing import List
 
-from multiprocessing import Process
 from parsl.multiprocessing import forkProcess, ForkProcess
 from parsl.version import VERSION as PARSL_VERSION
 
 logger = logging.getLogger(__name__)
+
 
 def async_process(fn):
     """ Decorator function to launch a function as a separate process """
