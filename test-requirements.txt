@@ -13,6 +13,7 @@ sqlalchemy-stubs
 typing_extensions   # to get newer type checking features - specifically PEP 589 on python <3.8
 types-paramiko
 types-requests
+types-six
 Sphinx==3.4.1
 twine
 wheel
