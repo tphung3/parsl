@@ -46,11 +46,11 @@ clean_coverage:
 
 .PHONY: mypy
 mypy: ## run mypy checks
-	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/multiprocessing.py
-	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/configs/
-	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/tests/sites/
-	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/
-	PYTHONPATH=$(pwd):$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/*.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/*py parsl/monitoring/*py
+	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy --no-incremental parsl/multiprocessing.py
+	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy --no-incremental parsl/tests/configs/
+	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy --no-incremental parsl/tests/sites/
+	PYTHONPATH=.:$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy --no-incremental parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/
+	PYTHONPATH=$(pwd):$(PYTHONPATH) MYPYPATH=$(CWD)/mypy-stubs mypy --no-incremental typecheck-root.py  parsl/tests/configs/  parsl/tests/sites/ parsl/executors/high_throughput/ parsl/executors/*.py parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/*py parsl/monitoring/*py
 
         # only the top level of monitoring is checked here because the visualization code does not type check
 	MYPYPATH=$(CWD)/mypy-stubs mypy parsl/app/ parsl/channels/ parsl/dataflow/ parsl/data_provider/ parsl/launchers parsl/providers/ parsl/monitoring/*py
