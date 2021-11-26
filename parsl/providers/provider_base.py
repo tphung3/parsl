@@ -162,6 +162,9 @@ class ExecutionProvider(metaclass=ABCMeta):
                                 |
                                 +-------------------
      """
+
+    # these are because these variables are implemented
+    # as properties... 
     _cores_per_node = None  # type: Optional[int]
     _mem_per_node = None  # type: Optional[float]
 
@@ -245,8 +248,7 @@ class ExecutionProvider(metaclass=ABCMeta):
         variable PARSL_MEMORY_GB before executing submitted commands.
 
         If this property is set, executors may use it to calculate how many tasks can
-        run concurrently per node. This information is used by dataflow.Strategy to estimate
-        the resources required to run all outstanding tasks.
+        run concurrently per node.
         """
         return self._mem_per_node
 
@@ -263,8 +265,7 @@ class ExecutionProvider(metaclass=ABCMeta):
         variable PARSL_CORES before executing submitted commands.
 
         If this property is set, executors may use it to calculate how many tasks can
-        run concurrently per node. This information is used by dataflow.Strategy to estimate
-        the resources required to run all outstanding tasks.
+        run concurrently per node.
         """
         return self._cores_per_node
 
