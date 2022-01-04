@@ -161,8 +161,7 @@ class GridEngineProvider(ClusterProvider, RepresentationMixin):
                 self.resources[job_id] = {'job_id': job_id, 'status': JobStatus(JobState.PENDING)}
                 return job_id
         else:
-            # TODO: this and any other prints should be tidied...
-            print("[WARNING!!] Submission of command to scale_out failed")
+            logger.error("Submission of command to submit failed")
             logger.error("Retcode:%s STDOUT:%s STDERR:%s", retcode, stdout.strip(), stderr.strip())
 
     def _status(self):
