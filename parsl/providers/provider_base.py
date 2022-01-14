@@ -117,10 +117,6 @@ class JobStatus(object):
                 size = f.tell()
                 f.seek(0, os.SEEK_SET)
                 if size > JobStatus.SUMMARY_TRUNCATION_THRESHOLD:
-                    # there is a round down here if SUMMARY_TRUNCATION_THRESHOLD
-                    # is not an even number.
-                    # That's probably better than the non-typechecked behaviour
-                    # which was for f.read to fail with being given a float not an int
                     half_threshold = int(JobStatus.SUMMARY_TRUNCATION_THRESHOLD / 2)
                     head = f.read(half_threshold)
                     f.seek(size - half_threshold, os.SEEK_SET)
