@@ -118,8 +118,3 @@ class AppFuture(Future):
     @property
     def outputs(self) -> List[DataFuture]:
         return self._outputs
-
-    def __repr__(self) -> str:
-        return '<%s super=%s>' % (
-            self.__class__.__name__,
-            super().__repr__())
