@@ -67,19 +67,7 @@ class ParslExecutor(metaclass=ABCMeta):
     @abstractmethod
     def submit(self, func: Callable, resource_specification: Dict[str, Any], *args: Any, **kwargs: Dict[str, Any]) -> Future:
         """Submit.
-
-        We haven't yet decided on what the args to this can be,
-        whether it should just be func, args, kwargs or be the partially evaluated
-        fn
-
-        BENC: based on how ipp uses this, this follows the semantics of async_apply from ipyparallel.
-        Based on how the thread executor works, its:
-
-            https://docs.python.org/3/library/concurrent.futures.html
-            Schedules the callable, fn, to be executed as fn(*args **kwargs) and returns a Future object representing the execution of the callable.
-
-        These are consistent
-
+        TODO: write something nice here
         """
         pass
 
