@@ -12,6 +12,7 @@ import platform
 from typing import List
 
 from parsl.multiprocessing import forkProcess, ForkProcess
+from parsl.dataflow.states import States
 from parsl.version import VERSION as PARSL_VERSION
 
 logger = logging.getLogger(__name__)
@@ -180,7 +181,7 @@ class UsageTracker (object):
 
         site_count = len([x for x in self.dfk.config.executors if x.managed])
 
-        app_fails = self.dfk.tasks_failed_count + self.dfk.tasks_dep_fail_count
+        app_fails = self.dfk.task_state_counts[States.failed] + self.dfk.task_state_counts[States.dep_fail]
 
         message = {'uuid': self.uuid,
                    'end': time.time(),
