@@ -163,6 +163,7 @@ Exceptions
     parsl.channels.errors.SSHException
     parsl.channels.errors.FileCopyException
     parsl.executors.high_throughput.errors.WorkerLost
+    parsl.executors.high_throughput.interchange.ManagerLost
 
 Internal
 ========
