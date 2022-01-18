@@ -95,16 +95,15 @@ class PollItem(ExecutorStatus):
         block_ids = self._executor.scale_out(n)
         logger.debug("BENC: executor scale out has returned")
 
-        if block_ids is not None:
-            logger.debug(f"BENC: there were some block ids, {block_ids}, which will now be set to pending")
-            new_status = {}
-            for block_id in block_ids:
-                new_status[block_id] = JobStatus(JobState.PENDING)
-            self.send_monitoring_info(new_status)
-            self._status.update(new_status)
-        # else:
-            # mypy declares this as unreachable...
-            # logger.debug("BENC: there were no block IDs returned from the scale out call")
+        # mypy - remove this if statement: block_ids is always a list according to the types.
+        # and so the else clause was failing with unreachable code. And this removed `if`
+        # would always fire, if that type annotation is true.
+        logger.debug(f"BENC: there were some block ids, {block_ids}, which will now be set to pending")
+        new_status = {}
+        for block_id in block_ids:
+            new_status[block_id] = JobStatus(JobState.PENDING)
+        self.send_monitoring_info(new_status)
+        self._status.update(new_status)
         return block_ids
 
     def __repr__(self) -> str:
