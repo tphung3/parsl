@@ -7,7 +7,7 @@ import threading
 import time
 import typeguard
 from contextlib import contextmanager
-from typing import Callable, List, Sequence, Tuple, Union, Generator, IO, AnyStr, Dict
+from typing import Any, Callable, List, Sequence, Tuple, Union, Generator, IO, AnyStr, Dict
 from typing_extensions import Protocol, runtime_checkable
 
 import parsl
@@ -100,9 +100,7 @@ def get_last_checkpoint(rundir: str = "runinfo") -> Sequence[str]:
 @typeguard.typechecked
 def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
     import parsl.app.errors as pe
-    if stdfspec is None:
-        return None, None
-    elif isinstance(stdfspec, str):
+    if isinstance(stdfspec, str):
         fname = stdfspec
         mode = 'a+'
     elif isinstance(stdfspec, tuple):
@@ -111,9 +109,6 @@ def get_std_fname_mode(fdname: str, stdfspec: Union[str, Tuple[str, str]]) -> Tu
                    f"{len(stdfspec)}")
             raise pe.BadStdStreamFile(msg, TypeError('Bad Tuple Length'))
         fname, mode = stdfspec
-    else:
-        msg = f"std descriptor {fdname} has unexpected type {type(stdfspec)}"
-        raise pe.BadStdStreamFile(msg, TypeError('Bad Tuple Type'))
     return fname, mode
 
 
@@ -190,6 +185,7 @@ class RepresentationMixin(object):
     # vs PR 1846: this has a type: ignore where I have more invasively changed the code to
     # use type(self).__init__ and not checked if that works
     def __repr__(self) -> str:
+        init: Any  # to override something I don't understand with myppy vs the init, iswrapper test below
         init = type(self).__init__  # does this change from self.__init__ work?
 
         # This test looks for a single layer of wrapping performed by
