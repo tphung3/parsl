@@ -270,6 +270,12 @@ def _taskvine_submit_wait(ready_task_queue=None,
                     # This cost is paid only once per function/app.
                     func = _deserialize_object_from_file(task.function_file)
 
+                    # Deserialize the function context to add it to the library if available
+                    # This cost is paid only once per function/app.
+                    function_context_list = None
+                    if task.function_context_file:
+                        function_context_list = _deserialize_object_from_file(task.function_context_file)
+
                     # Don't automatically add environment so manager can declare and cache the vine file associated with the environment file
                     add_env = False
                     lib_name = f'{task.func_name}-lib'
@@ -278,7 +284,8 @@ def _taskvine_submit_wait(ready_task_queue=None,
                                                                      poncho_env=poncho_env_path,
                                                                      init_command=manager_config.init_command,
                                                                      exec_mode='direct',
-                                                                     add_env=add_env)
+                                                                     add_env=add_env,
+                                                                     library_context_info=function_context_list)
 
                     # Configure the library if provided
                     if manager_config.library_config:
